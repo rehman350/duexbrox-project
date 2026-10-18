@@ -17,7 +17,9 @@
           "settings": {
             "number": "01",
             "products": [],
-            "link": "/pages/uniform-01"
+            "link": "/pages/uniform-01",
+            "preview": "dx-pv-uf-01.jpg",
+            "handles": "i-dont-say-hi-back-tee, the-cargo-short"
           }
         },
         "uniform_2": {
@@ -25,7 +27,9 @@
           "settings": {
             "number": "02",
             "products": [],
-            "link": "/pages/uniform-02"
+            "link": "/pages/uniform-02",
+            "preview": "dx-pv-uf-02.jpg",
+            "handles": "unapologetic-tee, leopard-leather-pants"
           }
         },
         "uniform_3": {
@@ -33,7 +37,9 @@
           "settings": {
             "number": "03",
             "products": [],
-            "link": "/pages/uniform-03"
+            "link": "/pages/uniform-03",
+            "preview": "dx-pv-uf-03.jpg",
+            "handles": "digital-tee, the-wide-cargo"
           }
         },
         "uniform_4": {
@@ -41,7 +47,9 @@
           "settings": {
             "number": "04",
             "products": [],
-            "link": "/pages/uniform-04"
+            "link": "/pages/uniform-04",
+            "preview": "dx-pv-uf-04.jpg",
+            "handles": "the-sherpa-zip, the-wide-cargo"
           }
         },
         "uniform_5": {
@@ -49,7 +57,9 @@
           "settings": {
             "number": "05",
             "products": [],
-            "link": "/pages/uniform-05"
+            "link": "/pages/uniform-05",
+            "preview": "dx-pv-uf-05.jpg",
+            "handles": "the-quote-tee, the-wide-cargo"
           }
         },
         "uniform_6": {
@@ -57,7 +67,9 @@
           "settings": {
             "number": "06",
             "products": [],
-            "link": "/pages/uniform-06"
+            "link": "/pages/uniform-06",
+            "preview": "dx-pv-uf-06.jpg",
+            "handles": "the-heavyweight-hoodie, the-cargo-short"
           }
         }
       },

@@ -15,7 +15,8 @@
         "ratio": "2 / 1",
         "position": "right center",
         "loading": "eager",
-        "anchor": ""
+        "anchor": "",
+        "preview": "dx-pv-about.jpg"
       }
     },
     "marquee": {

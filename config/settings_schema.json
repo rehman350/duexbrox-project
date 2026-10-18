@@ -2145,20 +2145,20 @@
       },
       {
         "type": "header",
-        "content": "Test images"
+        "content": "Temporary preview images"
       },
       {
         "type": "checkbox",
-        "id": "dx_test_images",
-        "label": "Use test product image",
-        "info": "Products without photos show the test image. Turn off once real photos are uploaded.",
+        "id": "dx_preview_images",
+        "label": "Preview mode (temporary images and sample reviews)",
+        "info": "Fills empty image settings and products without photos with bundled preview photos, and shows the sample review strip. Each preview photo disappears on its own when you pick a real image or upload product media. Turn off before launch.",
         "default": true
       },
       {
         "type": "image_picker",
         "id": "dx_test_image",
-        "label": "Test image override",
-        "info": "Optional. Defaults to the bundled black tee."
+        "label": "Fallback product image",
+        "info": "Optional. Used for products without photos that have no bundled preview photo."
       }
     ]
   }

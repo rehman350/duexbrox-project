@@ -4,31 +4,54 @@
   @param {image} image
   @param {string} number - e.g. "01"
   @param {product[]} products - the products that make up the outfit
+  @param {string} [handles] - comma-separated product handles, used while products is empty
+  @param {string} [preview] - temporary preview image (theme asset)
   @param {string} url - uniform detail page
   @param {number} [index]
   @param {string} [sizes]
 {%- endcomment -%}
 {%- liquid
   assign sizes = sizes | default: '(min-width: 1200px) 23vw, (min-width: 900px) 31vw, (min-width: 540px) 46vw, 80vw'
+  assign items = products
+  assign by_handle = false
+  if products == blank or products.size == 0
+    assign items = handles | default: '' | split: ','
+    assign by_handle = true
+  endif
   assign total = 0
-  for p in products
-    assign total = total | plus: p.price
+  assign count = 0
+  for it in items
+    assign p = it
+    if by_handle
+      assign hh = it | strip
+      assign p = all_products[hh]
+    endif
+    if p.id != blank
+      assign total = total | plus: p.price
+      assign count = count | plus: 1
+    endif
   endfor
   assign ph = index | default: 1 | modulo: 2 | plus: 1
 -%}
 <a href="{{ url | default: '#' }}" class="dx-uni">
   <div class="dx-media dx-zoom dx-uni__media">
-    {%- if image != blank -%}
-      {{ image | image_url: width: 1400 | image_tag: widths: '400,600,800,1000,1400', sizes: sizes, loading: 'lazy', alt: image.alt | default: '' }}
-    {%- else -%}
-      {{ 'lifestyle-' | append: ph | placeholder_svg_tag: 'dx-ph' }}
-    {%- endif -%}
+    {%- assign ph_name = 'lifestyle-' | append: ph -%}
+    {%- render 'dx-img', image: image, preview: preview, ph: ph_name, width: 1400, widths: '400,600,800,1000,1400', sizes: sizes -%}
   </div>
   <span class="dx-uni__no">{{ number | escape }}</span>
   <div class="dx-uni__info">
     <p class="dx-uni__names">
-      {%- if products.size > 0 -%}
-        {%- for p in products -%}<span>{{ p.title | escape }}</span>{%- endfor -%}
+      {%- if count > 0 -%}
+        {%- for it in items -%}
+          {%- liquid
+            assign p = it
+            if by_handle
+              assign hh = it | strip
+              assign p = all_products[hh]
+            endif
+          -%}
+          {%- if p.id != blank -%}<span>{{ p.title | escape }}</span>{%- endif -%}
+        {%- endfor -%}
       {%- else -%}
         <span>Assign products</span>
       {%- endif -%}

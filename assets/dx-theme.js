@@ -76,20 +76,29 @@
     let i = items.findIndex((el) => el.classList.contains('is-on'));
     if (i < 0) i = 0;
     const delay = (Number(root.dataset.speed) || 5) * 1000;
+    const opts = { duration: 650, easing: 'cubic-bezier(0.65, 0, 0.35, 1)' };
     let timer;
+    let anims = [];
+    // Horizontal slide: "next" pushes the current message out to the left and brings the new one in
+    // from the right; "previous" does the mirror image.
     const show = (n, dir = 1) => {
+      anims.forEach((a) => a.finish());
       const prev = items[i];
       i = (n + items.length) % items.length;
       const next = items[i];
       if (prev === next) return;
-      root.style.setProperty('--dx-ann-dir', dir);
       prev.classList.remove('is-on');
-      prev.classList.add('is-out');
       prev.setAttribute('aria-hidden', 'true');
-      next.classList.remove('is-out');
       next.classList.add('is-on');
       next.removeAttribute('aria-hidden');
-      setTimeout(() => prev.classList.remove('is-out'), 600);
+      if (reduce.matches || !next.animate) return;
+      prev.classList.add('is-out');
+      anims = [
+        prev.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-dir * 100}%)` }], opts),
+        next.animate([{ transform: `translateX(${dir * 100}%)` }, { transform: 'translateX(0)' }], opts)
+      ];
+      anims[0].onfinish = () => prev.classList.remove('is-out');
+      anims[1].onfinish = () => (anims = []);
     };
     const play = () => {
       clearInterval(timer);
@@ -175,12 +184,14 @@
       if (prev) prev.hidden = track.scrollLeft <= 2;
       if (next) next.hidden = track.scrollLeft >= max;
     };
+    // One card per click: 1-4 → 2-5 → 3-6 …
     const step = (dir) => {
       const item = track.children[0];
       const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
       const w = item ? item.getBoundingClientRect().width + gap : track.clientWidth;
-      const per = Math.max(1, Math.floor((track.clientWidth + gap) / w));
-      track.scrollBy({ left: dir * w * per, behavior: reduce.matches ? 'auto' : 'smooth' });
+      const max = track.scrollWidth - track.clientWidth;
+      const idx = Math.round(track.scrollLeft / w) + dir;
+      track.scrollTo({ left: Math.max(0, Math.min(max, idx * w)), behavior: reduce.matches ? 'auto' : 'smooth' });
     };
     prev?.addEventListener('click', () => step(-1));
     next?.addEventListener('click', () => step(1));

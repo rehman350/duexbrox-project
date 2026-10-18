@@ -10,7 +10,8 @@
   assign reviews = section.blocks | where: 'type', 'review'
   assign show_reviews = false
   if reviews.size > 0
-    if s.reviews_verified or request.design_mode
+    # Sample reviews show in the editor and while preview mode is on (pre-launch); real ones need the tick.
+    if s.reviews_verified or request.design_mode or settings.dx_preview_images
       assign show_reviews = true
     endif
   endif
@@ -66,8 +67,18 @@
             </figure>
           {%- endfor -%}
         {%- else -%}
-          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-1', alt: product.title -%}</figure>
-          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-2' -%}</figure>
+          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-1', product: product, alt: product.title -%}</figure>
+          {%- liquid
+            assign pv_back = true
+            if settings.dx_preview_images
+              unless product.handle contains '-tee'
+                assign pv_back = false
+              endunless
+            endif
+          -%}
+          {%- if pv_back -%}
+            <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-2', product: product, back: true -%}</figure>
+          {%- endif -%}
         {%- endif -%}
       </div>
 
@@ -85,9 +96,9 @@
 
           {%- if show_reviews -%}
             <div class="dx-pd__rev" aria-label="Customer reviews">
-              {%- unless s.reviews_verified -%}
-                <p class="dx-pd__revnote">Theme editor only: these sample reviews stay hidden on the live store until "Reviews are real" is ticked.</p>
-              {%- endunless -%}
+              {%- if request.design_mode and s.reviews_verified == false -%}
+                <p class="dx-pd__revnote">Sample reviews: shown only while preview mode is on. Tick "Reviews are real" once these are genuine.</p>
+              {%- endif -%}
               <div class="dx-mq dx-pd__mq" style="--dx-mq-speed: {{ s.review_speed }}s; --dx-mq-gap: 0px; --dx-mq-pause: paused;">
                 {%- for r in (1..2) -%}
                   <ul class="dx-mq__row" role="list" {% if forloop.last %}aria-hidden="true"{% endif %}>
@@ -366,6 +377,9 @@
 
   .dx-pd__rev {
     margin-top: clamp(16px, 1.6vw, 24px);
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .dx-pd__revnote {
@@ -741,7 +755,7 @@
 
   @media (max-width: 899px) {
     .dx-pd__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .dx-pd__gallery {
@@ -794,11 +808,11 @@
     { "type": "range", "id": "low_stock", "label": "Show 'Only X left' at or below", "min": 0, "max": 10, "step": 1, "default": 3 },
     { "type": "header", "content": "Size chart" },
     { "type": "page", "id": "size_chart_page", "label": "Size chart page", "info": "Used when the product has no dx.size_chart metafield." },
-    { "type": "richtext", "id": "size_chart", "label": "Size chart text fallback" },
+    { "type": "html", "id": "size_chart", "label": "Size chart fallback (HTML)", "info": "Used when there is no metafield or page. A table works here." },
     { "type": "header", "content": "Packaging" },
     { "type": "richtext", "id": "packaging", "label": "Packaging note", "default": "<p>Every order arrives in our custom <strong>DUEXBROX packaging</strong>, designed to protect your pieces from delivery to wardrobe.</p>" },
     { "type": "header", "content": "Reviews strip" },
-    { "type": "checkbox", "id": "reviews_verified", "label": "Reviews are real customer reviews", "default": false, "info": "Leave unticked while using sample text. The strip only shows on the live store when ticked." },
+    { "type": "checkbox", "id": "reviews_verified", "label": "Reviews are real customer reviews", "default": false, "info": "Leave unticked while using sample text. Unticked, the strip only shows in the editor and while Theme settings → DUEXBROX → Preview mode is on." },
     { "type": "range", "id": "review_speed", "label": "Strip speed (seconds per loop)", "min": 10, "max": 80, "step": 5, "default": 35 },
     { "type": "header", "content": "Extras" },
     { "type": "checkbox", "id": "first_faq_open", "label": "Open the first FAQ on load", "default": true },

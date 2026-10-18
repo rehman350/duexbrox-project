@@ -27,7 +27,7 @@
                     {%- if item.image -%}
                       {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.product.title, widths: '150,300' }}
                     {%- else -%}
-                      {%- render 'dx-ph', name: 'product-apparel-1' -%}
+                      {%- render 'dx-ph', name: 'product-apparel-1', product: item.product -%}
                     {%- endif -%}
                   </a>
                   <div class="dx-cart__info">

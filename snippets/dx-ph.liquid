@@ -1,14 +1,32 @@
 {%- comment -%}
-  DUEXBROX product placeholder. While "Use test product image" is on (Theme settings → DUEXBROX),
-  products without photos show the test image instead of the Shopify SVG placeholder.
-  @param {string} name - placeholder_svg_tag name used when test images are off
+  DUEXBROX product image placeholder, used only when a product has no media.
+  While Theme settings → DUEXBROX → "Show temporary preview images" is on it shows a preview photo
+  (the bundled DUEXBROX product shot when the handle matches, else the test image); otherwise the
+  Shopify SVG placeholder. Uploading real product media replaces it automatically.
+  @param {string} name - placeholder_svg_tag name
+  @param {product} [product]
+  @param {boolean} [back] - show the back view
   @param {string} [alt]
+  @param {string} [class]
 {%- endcomment -%}
-{%- if settings.dx_test_images -%}
-  {%- if settings.dx_test_image != blank -%}
-    {{ settings.dx_test_image | image_url: width: 1200 | image_tag: widths: '300,600,900,1200', loading: 'lazy', class: 'dx-ph dx-ph--img', alt: alt | default: '' }}
+{%- liquid
+  assign pv_handles = 'digital-tee,i-dont-say-hi-back-tee,leopard-leather-pants,the-cargo-short,the-heavyweight-hoodie,the-quote-tee,the-sherpa-zip,the-wide-cargo,unapologetic-tee' | split: ','
+  assign src = 'dx-pv-tee-back.jpg'
+  if product and pv_handles contains product.handle
+    if back
+      if product.handle == 'digital-tee'
+        assign src = 'dx-pv-p-digital-tee-back.jpg'
+      endif
+    else
+      assign src = 'dx-pv-p-' | append: product.handle | append: '.jpg'
+    endif
+  endif
+-%}
+{%- if settings.dx_preview_images -%}
+  {%- if settings.dx_test_image != blank and src == 'dx-pv-tee-back.jpg' -%}
+    {{ settings.dx_test_image | image_url: width: 1200 | image_tag: widths: '300,600,900,1200', loading: 'lazy', class: 'dx-ph dx-ph--img ' | append: class, alt: alt | default: '' }}
   {%- else -%}
-    <img src="{{ 'dx-test-tee.webp' | asset_url }}" width="550" height="550" loading="lazy" class="dx-ph dx-ph--img" alt="{{ alt | default: '' | escape }}">
+    <img src="{{ src | asset_url }}" width="1000" height="1000" loading="lazy" class="dx-ph dx-ph--img {{ class }}" alt="{{ alt | default: '' | escape }}">
   {%- endif -%}
 {%- else -%}
   {{ name | default: 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}

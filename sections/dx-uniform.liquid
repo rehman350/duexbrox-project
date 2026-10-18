@@ -9,40 +9,51 @@
   assign hero = null
   assign number = ''
   assign products = null
-  assign found = false
+  assign handles = ''
+  assign hero_preview = ''
+  assign page_no = page.handle | split: '-' | last
   assign current_block = null
 
   if metaobject != blank and metaobject.system.type == 'dx_uniform'
     assign hero = metaobject.image.value
     assign number = metaobject.number.value
     assign products = metaobject.products.value
-    assign found = true
   else
     for block in section.blocks
+      assign hit = false
       if block.settings.page != blank and block.settings.page.handle == page.handle
-        assign hero = block.settings.image
-        assign number = block.settings.number
-        assign products = block.settings.products
+        assign hit = true
+      elsif block.settings.page == blank and block.settings.page_handle == page.handle
+        assign hit = true
+      endif
+      if hit
         assign current_block = block
-        assign found = true
         break
       endif
     endfor
-    if found == false and section.blocks.size > 0 and request.design_mode
+    if current_block == null
+      for block in section.blocks
+        if block.settings.page == blank and block.settings.number == page_no
+          assign current_block = block
+          break
+        endif
+      endfor
+    endif
+    if current_block == null and section.blocks.size > 0 and request.design_mode
       assign current_block = section.blocks.first
+    endif
+    if current_block
       assign hero = current_block.settings.image
+      assign hero_preview = current_block.settings.preview
       assign number = current_block.settings.number
       assign products = current_block.settings.products
+      assign handles = current_block.settings.handles
     endif
   endif
 -%}
 <div class="dx dx-uf" {% if current_block %}{{ current_block.shopify_attributes }}{% endif %}>
   <div class="dx-media dx-uf__hero">
-    {%- if hero != blank -%}
-      {{ hero | image_url: width: 3200 | image_tag: widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high', alt: hero.alt | default: '' }}
-    {%- else -%}
-      {{ 'lifestyle-1' | placeholder_svg_tag: 'dx-ph' }}
-    {%- endif -%}
+    {%- render 'dx-img', image: hero, preview: hero_preview, ph: 'lifestyle-1', width: 3200, widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high' -%}
   </div>
 
   <div class="dx-wrap">
@@ -50,14 +61,30 @@
     <p class="dx-uf__sub">{{ s.subtitle | escape }}</p>
 
     <ul class="dx-uf__grid" role="list">
-      {%- if products != blank and products.size > 0 -%}
-        {%- for p in products -%}
+      {%- liquid
+        assign items = products
+        assign by_handle = false
+        if products == blank or products.size == 0
+          assign items = handles | default: '' | split: ','
+          assign by_handle = true
+        endif
+      -%}
+      {%- if items.size > 0 -%}
+        {%- for it in items -%}
+          {%- liquid
+            assign p = it
+            if by_handle
+              assign hh = it | strip
+              assign p = all_products[hh]
+            endif
+          -%}
+          {%- if p.id == blank -%}{%- continue -%}{%- endif -%}
           <li class="dx-uf__item dx-rv" style="--dx-d: {{ forloop.index0 | times: 0.1 }}s">
             <a href="{{ p.url }}" class="dx-media dx-card__media dx-uf__media">
               {%- if p.featured_media -%}
                 {{ p.featured_media.preview_image | image_url: width: 1200 | image_tag: widths: '400,600,800,1000,1200', sizes: '(min-width: 900px) 380px, 50vw', loading: 'lazy', alt: p.featured_media.alt | default: p.title, class: 'dx-card__main' }}
               {%- else -%}
-                {%- render 'dx-ph', name: 'product-apparel-1', alt: p.title -%}
+                {%- render 'dx-ph', name: 'product-apparel-1', product: p, alt: p.title, class: 'dx-card__main' -%}
               {%- endif -%}
             </a>
             <div class="dx-uf__row">
@@ -197,9 +224,12 @@
       "name": "Uniform",
       "settings": [
         { "type": "page", "id": "page", "label": "Page", "info": "The Shopify page this uniform appears on (e.g. Uniform 01)." },
+        { "type": "text", "id": "page_handle", "label": "Page handle (fallback)", "info": "Used while Page is empty, e.g. uniform-01. A page ending in the same number also matches." },
         { "type": "text", "id": "number", "label": "Number", "default": "01" },
         { "type": "image_picker", "id": "image", "label": "Hero image", "info": "Wide, at least 2400 x 900 px." },
-        { "type": "product_list", "id": "products", "label": "Products", "limit": 4 }
+        { "type": "text", "id": "preview", "label": "Temporary preview image", "info": "Bundled preview photo shown only while the image is empty. Clear it, or pick a real image, to remove it." },
+        { "type": "product_list", "id": "products", "label": "Products", "limit": 4 },
+        { "type": "text", "id": "handles", "label": "Product handles (fallback)", "info": "Comma-separated product handles, used only while Products is empty, e.g. digital-tee, the-wide-cargo." }
       ]
     }
   ]

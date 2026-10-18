@@ -1,7 +1,17 @@
 {%- comment -%} DUEXBROX product carousel (New Arrivals). Products, prices and images come from the chosen collection. {%- endcomment -%}
 {%- liquid
   assign s = section.settings
+  # Fallbacks keep the row filled before a collection is picked: new-arrivals, then duexbrox, then all products.
   assign col = s.collection
+  if col == blank
+    assign col = collections['new-arrivals']
+  endif
+  if col == blank or col.products_count == 0
+    assign col = collections['duexbrox']
+  endif
+  if col == blank or col.products_count == 0
+    assign col = collections.all
+  endif
   assign link = s.link | default: col.url | default: routes.all_products_collection_url
 -%}
 <section class="dx dx-prods" aria-labelledby="DxProdsH-{{ section.id }}">

@@ -965,7 +965,7 @@ a:focus-visible .dx-zoom > img {
   height: 14px;
 }
 
-.dx-uni:hover .dx-uni__plus,
+.dx-uni__plus:hover,
 .dx-uni:focus-visible .dx-uni__plus {
   background: var(--dx-black);
   color: var(--dx-white);
