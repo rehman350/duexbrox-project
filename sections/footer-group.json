@@ -20,7 +20,7 @@
             "heading": "SHOP",
             "menu": "",
             "label_1": "New Arrivals",
-            "url_1": "/collections/new-arrivals",
+            "url_1": "/collections/duexbrox-new-arrivals",
             "label_2": "T-Shirts",
             "url_2": "/collections/t-shirts",
             "label_3": "Hoodies",
@@ -61,13 +61,13 @@
             "heading": "HELP",
             "menu": "",
             "label_1": "FAQ",
-            "url_1": "/pages/faq",
+            "url_1": "/pages/duexbrox-faq",
             "label_2": "Shipping",
-            "url_2": "/pages/faq#shipping",
+            "url_2": "/pages/duexbrox-faq#shipping",
             "label_3": "Returns",
-            "url_3": "/pages/faq#returns",
+            "url_3": "/pages/duexbrox-faq#returns",
             "label_4": "Support",
-            "url_4": "/pages/faq#support"
+            "url_4": "/pages/duexbrox-faq#support"
           }
         }
       },

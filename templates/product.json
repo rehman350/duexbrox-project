@@ -86,7 +86,7 @@
       "settings": {
         "brand": "DUEXBROX",
         "tax_text": "Tax included. [Shipping] calculated at checkout.",
-        "shipping_link": "/pages/faq#shipping",
+        "shipping_link": "/pages/duexbrox-faq#shipping",
         "show_dynamic_checkout": true,
         "low_stock": 3,
         "size_chart_page": "",
