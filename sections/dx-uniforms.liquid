@@ -1,0 +1,202 @@
+{%- comment -%}
+  DUEXBROX Uniforms: homepage carousel or the 4 + 2 gallery (Uniforms and Lookbook pages).
+  Data source:
+  - "metaobject": entries of the dx_uniform metaobject (number, image, products). One place to edit,
+    each entry gets its own page at /pages/dx_uniform/<handle> (see docs).
+  - "blocks": Uniform blocks in this section (works with no Admin setup).
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign use_meta = false
+  if s.source == 'metaobject' and shop.metaobjects.dx_uniform.values.size > 0
+    assign use_meta = true
+  endif
+  assign is_car = false
+  if s.layout == 'carousel'
+    assign is_car = true
+  endif
+  assign tag = 'h2'
+  if s.layout == 'grid' and s.page_title
+    assign tag = 'h1'
+  endif
+-%}
+
+{%- capture cards -%}
+  {%- if use_meta -%}
+    {%- for u in shop.metaobjects.dx_uniform.values limit: s.limit -%}
+      {%- liquid
+        assign u_products = u.products.value
+        if u_products == blank
+          assign u_products = ''
+          assign u_products = u_products | split: ','
+        endif
+        assign u_url = u.system.url
+        if u.link != blank
+          assign u_url = u.link.value
+        endif
+        assign u_number = u.number.value | default: forloop.index
+      -%}
+      <li class="dx-rv" style="--dx-d: {{ forloop.index0 | modulo: 4 | times: 0.08 }}s">
+        {%- render 'dx-uniform-card', image: u.image.value, number: u_number, products: u_products, url: u_url, index: forloop.index -%}
+      </li>
+    {%- endfor -%}
+  {%- else -%}
+    {%- for block in section.blocks limit: s.limit -%}
+      <li class="dx-rv" style="--dx-d: {{ forloop.index0 | modulo: 4 | times: 0.08 }}s" {{ block.shopify_attributes }}>
+        {%- assign b_no = block.settings.number | default: forloop.index -%}
+        {%- render 'dx-uniform-card', image: block.settings.image, number: b_no, products: block.settings.products, url: block.settings.link, index: forloop.index -%}
+      </li>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+<section class="dx dx-unis dx-unis--{{ s.layout }}" aria-labelledby="DxUnisH-{{ section.id }}">
+  <div class="dx-wrap">
+    <div class="dx-head dx-unis__head">
+      <div>
+        <{{ tag }} class="dx-h {% if tag == 'h1' %}dx-h--page{% else %}dx-h--sec{% endif %}" id="DxUnisH-{{ section.id }}">{{ s.heading | escape }}</{{ tag }}>
+        {%- if s.subtitle != blank -%}
+          <p class="dx-unis__sub">{{ s.subtitle | escape }}</p>
+        {%- endif -%}
+      </div>
+      {%- if s.link_label != blank -%}
+        {%- render 'dx-roll', label: s.link_label, url: s.link -%}
+      {%- endif -%}
+    </div>
+
+    {%- if is_car -%}
+      <div class="dx-car" data-dx-carousel>
+        <ul class="dx-car__track dx-unis__list" data-dx-track role="list">{{ cards }}</ul>
+        <button type="button" class="dx-arrow dx-arrow--prev dx-car__nav dx-car__nav--prev dx-unis__nav" data-dx-prev aria-label="Previous uniforms" hidden>
+          {%- render 'dx-icon', name: 'arrow-left' -%}
+        </button>
+        <button type="button" class="dx-arrow dx-car__nav dx-car__nav--next dx-unis__nav" data-dx-next aria-label="Next uniforms">
+          {%- render 'dx-icon', name: 'arrow' -%}
+        </button>
+      </div>
+    {%- else -%}
+      <ul class="dx-unis__grid dx-unis__list" role="list">{{ cards }}</ul>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .dx-unis {
+    padding-block: calc(var(--dx-sec) * 0.6) var(--dx-sec);
+  }
+
+  .dx-unis--grid {
+    padding-block: clamp(40px, 5vw, 84px) clamp(56px, 6vw, 96px);
+  }
+
+  .dx-unis--grid .dx-unis__head {
+    margin-bottom: clamp(24px, 2.2vw, 36px);
+  }
+
+  .dx-unis__sub {
+    margin-top: 12px;
+    font-size: clamp(14px, 1vw, 18px);
+    color: #4a4a4a;
+  }
+
+  .dx-unis__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dx-unis__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--dx-gap);
+  }
+
+  .dx-unis__nav {
+    background: #fff;
+    color: var(--dx-black);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  .dx-unis__nav::before {
+    background: var(--dx-black);
+  }
+
+  .dx-unis__nav:hover,
+  .dx-unis__nav:focus-visible {
+    color: #fff;
+  }
+
+  @media (max-width: 1099px) {
+    .dx-unis__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 799px) {
+    .dx-unis__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 420px) {
+    .dx-unis__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Uniforms",
+  "class": "dx-unis-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "select", "id": "layout", "label": "Layout",
+      "options": [
+        { "value": "carousel", "label": "Carousel (homepage)" },
+        { "value": "grid", "label": "Grid (Uniforms / Lookbook page)" }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "select", "id": "source", "label": "Uniform data",
+      "options": [
+        { "value": "blocks", "label": "Uniform blocks in this section" },
+        { "value": "metaobject", "label": "Metaobject entries (dx_uniform)" }
+      ],
+      "default": "blocks",
+      "info": "Metaobject mode falls back to the blocks until dx_uniform entries exist."
+    },
+    { "type": "range", "id": "limit", "label": "Uniforms to show", "min": 2, "max": 12, "step": 1, "default": 6 },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "UNIFORMS" },
+    { "type": "checkbox", "id": "page_title", "label": "Heading is the page title (grid layout)", "default": true },
+    { "type": "text", "id": "subtitle", "label": "Subtitle" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "VIEW ALL UNIFORMS" },
+    { "type": "url", "id": "link", "label": "Link" }
+  ],
+  "blocks": [
+    {
+      "type": "uniform",
+      "name": "Uniform",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "01" },
+        { "type": "image_picker", "id": "image", "label": "Lifestyle image", "info": "Portrait 3:4, at least 1200 x 1600 px." },
+        { "type": "product_list", "id": "products", "label": "Products in this outfit", "limit": 4, "info": "The card total is the sum of these products' prices." },
+        { "type": "url", "id": "link", "label": "Uniform page link", "info": "e.g. the page that uses the uniform template." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "DX Uniforms",
+      "blocks": [
+        { "type": "uniform", "settings": { "number": "01" } },
+        { "type": "uniform", "settings": { "number": "02" } },
+        { "type": "uniform", "settings": { "number": "03" } },
+        { "type": "uniform", "settings": { "number": "04" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

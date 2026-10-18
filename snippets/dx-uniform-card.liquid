@@ -1,0 +1,42 @@
+{%- comment -%}
+  Uniform (outfit) card: lifestyle image, number, pieces, outfit total, plus icon.
+  The total is the sum of each assigned product's current price, so it never drifts from Shopify.
+  @param {image} image
+  @param {string} number - e.g. "01"
+  @param {product[]} products - the products that make up the outfit
+  @param {string} url - uniform detail page
+  @param {number} [index]
+  @param {string} [sizes]
+{%- endcomment -%}
+{%- liquid
+  assign sizes = sizes | default: '(min-width: 1200px) 23vw, (min-width: 900px) 31vw, (min-width: 540px) 46vw, 80vw'
+  assign total = 0
+  for p in products
+    assign total = total | plus: p.price
+  endfor
+  assign ph = index | default: 1 | modulo: 2 | plus: 1
+-%}
+<a href="{{ url | default: '#' }}" class="dx-uni">
+  <div class="dx-media dx-zoom dx-uni__media">
+    {%- if image != blank -%}
+      {{ image | image_url: width: 1400 | image_tag: widths: '400,600,800,1000,1400', sizes: sizes, loading: 'lazy', alt: image.alt | default: '' }}
+    {%- else -%}
+      {{ 'lifestyle-' | append: ph | placeholder_svg_tag: 'dx-ph' }}
+    {%- endif -%}
+  </div>
+  <span class="dx-uni__no">{{ number | escape }}</span>
+  <div class="dx-uni__info">
+    <p class="dx-uni__names">
+      {%- if products.size > 0 -%}
+        {%- for p in products -%}<span>{{ p.title | escape }}</span>{%- endfor -%}
+      {%- else -%}
+        <span>Assign products</span>
+      {%- endif -%}
+    </p>
+    {%- if total > 0 -%}
+      <p class="dx-uni__price">{{ total | money_without_trailing_zeros }}</p>
+    {%- endif -%}
+  </div>
+  <span class="dx-uni__plus" aria-hidden="true">{%- render 'dx-icon', name: 'plus' -%}</span>
+  <span class="dx-sr">Shop uniform {{ number }}</span>
+</a>

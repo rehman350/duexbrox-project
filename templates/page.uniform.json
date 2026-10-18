@@ -1,0 +1,84 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "dx-uniform",
+      "blocks": {
+        "uniform_1": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "number": "01",
+            "products": []
+          }
+        },
+        "uniform_2": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "number": "02",
+            "products": []
+          }
+        },
+        "uniform_3": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "number": "03",
+            "products": []
+          }
+        },
+        "uniform_4": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "number": "04",
+            "products": []
+          }
+        },
+        "uniform_5": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "number": "05",
+            "products": []
+          }
+        },
+        "uniform_6": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "number": "06",
+            "products": []
+          }
+        }
+      },
+      "block_order": [
+        "uniform_1",
+        "uniform_2",
+        "uniform_3",
+        "uniform_4",
+        "uniform_5",
+        "uniform_6"
+      ],
+      "settings": {
+        "prefix": "UNIFORM",
+        "subtitle": "SHOP YOUR COMPLETE UNIFORM HERE",
+        "cta": "SHOP THIS ITEM",
+        "back_label": "ALL UNIFORMS",
+        "back_link": "/pages/uniforms"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

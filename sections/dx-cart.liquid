@@ -1,0 +1,361 @@
+{%- comment -%}
+  DUEXBROX cart page. Plain Shopify cart form: quantities post to /cart, remove links use
+  item.url_to_remove, checkout posts name="checkout". JS only auto-submits quantity changes.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<div class="dx dx-cart">
+  <div class="dx-wrap">
+    <nav class="dx-crumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="{{ routes.root_url }}">Home</a></li>
+        <li aria-current="page">Cart</li>
+      </ol>
+    </nav>
+    <h1 class="dx-cart__title">{{ s.heading | escape }}</h1>
+
+    {%- if cart.item_count > 0 -%}
+      <form action="{{ routes.cart_url }}" method="post" class="dx-cart__form" id="DxCartForm" data-dx-cart-form>
+        <div class="dx-cart__grid">
+          <div class="dx-cart__items">
+            <div class="dx-cart__thead" aria-hidden="true">
+              <span>Product</span><span>Quantity</span><span>Total</span>
+            </div>
+            <ul role="list" class="dx-cart__list">
+              {%- for item in cart.items -%}
+                <li class="dx-cart__row">
+                  <a href="{{ item.url }}" class="dx-media dx-cart__img">
+                    {%- if item.image -%}
+                      {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.product.title, widths: '150,300' }}
+                    {%- else -%}
+                      {{ 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+                    {%- endif -%}
+                  </a>
+                  <div class="dx-cart__info">
+                    <a href="{{ item.url }}" class="dx-cart__name">{{ item.product.title | escape }}</a>
+                    {%- unless item.product.has_only_default_variant -%}
+                      <p class="dx-cart__meta">
+                        {%- for option in item.options_with_values -%}
+                          {{ option.name | escape }}: {{ option.value | escape }}{% unless forloop.last %} / {% endunless %}
+                        {%- endfor -%}
+                      </p>
+                    {%- endunless -%}
+                    {%- for p in item.properties -%}
+                      {%- assign first = p.first | slice: 0 -%}
+                      {%- if p.last != blank and first != '_' -%}
+                        <p class="dx-cart__meta">{{ p.first | escape }}: {{ p.last | escape }}</p>
+                      {%- endif -%}
+                    {%- endfor -%}
+                    <p class="dx-cart__unit">{{ item.final_price | money }}</p>
+                    {%- for d in item.line_level_discount_allocations -%}
+                      <p class="dx-cart__meta">{{ d.discount_application.title | escape }} (-{{ d.amount | money }})</p>
+                    {%- endfor -%}
+                  </div>
+                  <div class="dx-cart__qty">
+                    <div class="dx-qty">
+                      <button type="button" class="dx-qty__b" data-dx-step="-1" aria-label="Decrease quantity of {{ item.product.title | escape }}">{%- render 'dx-icon', name: 'minus' -%}</button>
+                      <input
+                        type="number"
+                        name="updates[]"
+                        id="DxQty-{{ item.key | handle }}-{{ forloop.index }}"
+                        value="{{ item.quantity }}"
+                        min="0"
+                        {% if item.variant.quantity_rule.max != null %}max="{{ item.variant.quantity_rule.max }}"{% endif %}
+                        step="{{ item.variant.quantity_rule.increment | default: 1 }}"
+                        inputmode="numeric"
+                        aria-label="Quantity of {{ item.product.title | escape }}"
+                      >
+                      <button type="button" class="dx-qty__b" data-dx-step="1" aria-label="Increase quantity of {{ item.product.title | escape }}">{%- render 'dx-icon', name: 'plus' -%}</button>
+                    </div>
+                    <a href="{{ item.url_to_remove }}" class="dx-cart__rm dx-ul dx-ul--on">Remove</a>
+                  </div>
+                  <p class="dx-cart__total">{{ item.final_line_price | money }}</p>
+                </li>
+              {%- endfor -%}
+            </ul>
+            <noscript><button type="submit" name="update" class="dx-btn dx-btn--line">Update cart</button></noscript>
+          </div>
+
+          <aside class="dx-cart__sum" aria-label="Order summary">
+            {%- if s.show_note -%}
+              <div class="dx-fld">
+                <label for="DxCartNote">Order note</label>
+                <div class="dx-fld__box">
+                  <textarea id="DxCartNote" name="note" rows="3" placeholder="Special instructions">{{ cart.note }}</textarea>
+                </div>
+              </div>
+            {%- endif -%}
+            {%- for d in cart.cart_level_discount_applications -%}
+              <p class="dx-cart__line"><span>{{ d.title | escape }}</span><span>-{{ d.total_allocated_amount | money }}</span></p>
+            {%- endfor -%}
+            <p class="dx-cart__line dx-cart__line--total">
+              <span>Subtotal</span>
+              <span>{{ cart.total_price | money_with_currency }}</span>
+            </p>
+            <p class="dx-cart__note">{{ s.tax_note | escape }}</p>
+            <button type="submit" name="checkout" class="dx-btn dx-btn--block dx-cart__go">{{ s.checkout_label | escape }}</button>
+            {%- if additional_checkout_buttons and s.show_wallets -%}
+              <div class="dx-cart__wallets">{{ content_for_additional_checkout_buttons }}</div>
+            {%- endif -%}
+            <a href="{{ routes.all_products_collection_url }}" class="dx-cart__cont dx-ul dx-ul--on">Continue shopping</a>
+          </aside>
+        </div>
+      </form>
+    {%- else -%}
+      <div class="dx-cart__empty">
+        <p>{{ s.empty_text | escape }}</p>
+        <a href="{{ s.empty_link | default: routes.all_products_collection_url }}" class="dx-btn">{{ s.empty_cta | escape }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (() => {
+    const form = document.querySelector('[data-dx-cart-form]');
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = '1';
+    let t;
+    const submit = () => {
+      clearTimeout(t);
+      t = setTimeout(() => form.requestSubmit ? form.requestSubmit() : form.submit(), 500);
+    };
+    form.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-dx-step]');
+      if (!b) return;
+      const input = b.parentElement.querySelector('input');
+      const step = Number(input.step) || 1;
+      input.value = Math.max(0, Number(input.value) + Number(b.dataset.dxStep) * step);
+      submit();
+    });
+    form.addEventListener('change', (e) => {
+      if (e.target.name === 'updates[]') submit();
+    });
+    form.addEventListener('submit', (e) => {
+      if (e.submitter && e.submitter.name === 'checkout') return;
+      form.querySelectorAll('.dx-cart__row').forEach((r) => (r.style.opacity = '0.5'));
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .dx-cart {
+    padding-bottom: clamp(56px, 6vw, 110px);
+  }
+
+  .dx-cart__title {
+    margin: clamp(32px, 4vw, 64px) 0 clamp(24px, 3vw, 48px);
+    text-align: center;
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(22px, 2vw, 36px);
+  }
+
+  .dx-cart__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+    gap: clamp(28px, 4vw, 72px);
+    align-items: start;
+  }
+
+  .dx-cart__thead,
+  .dx-cart__row {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr) 150px 120px;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .dx-cart__thead {
+    grid-template-columns: minmax(0, 1fr) 150px 120px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--dx-line);
+    font-family: var(--dx-fh);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dx-muted);
+  }
+
+  .dx-cart__thead span:last-child,
+  .dx-cart__total {
+    text-align: right;
+  }
+
+  .dx-cart__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dx-cart__row {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--dx-line);
+    transition: opacity 0.3s;
+  }
+
+  .dx-cart__img {
+    aspect-ratio: 1;
+    background: var(--dx-card);
+  }
+
+  .dx-cart__img img {
+    object-fit: contain;
+  }
+
+  .dx-cart__name {
+    font-family: var(--dx-fh);
+    font-size: 13px;
+    text-transform: uppercase;
+    line-height: 1.35;
+  }
+
+  .dx-cart__meta,
+  .dx-cart__unit {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--dx-muted);
+  }
+
+  .dx-cart__qty {
+    display: grid;
+    gap: 10px;
+    justify-items: start;
+  }
+
+  .dx-qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--dx-line);
+    border-radius: 999px;
+  }
+
+  .dx-qty__b {
+    width: 38px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .dx-qty__b svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .dx-qty input {
+    width: 40px;
+    border: 0;
+    text-align: center;
+    font: inherit;
+    font-size: 15px;
+    background: transparent;
+    -moz-appearance: textfield;
+  }
+
+  .dx-qty input::-webkit-outer-spin-button,
+  .dx-qty input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .dx-cart__rm {
+    font-size: 12px;
+    color: var(--dx-muted);
+  }
+
+  .dx-cart__total {
+    font-size: 15px;
+  }
+
+  .dx-cart__sum {
+    position: sticky;
+    top: calc(var(--dx-hd-h, 76px) + 16px);
+    display: grid;
+    gap: 16px;
+    padding: clamp(20px, 2vw, 32px);
+    background: var(--dx-gray);
+  }
+
+  .dx-cart__line {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  .dx-cart__line--total {
+    font-family: var(--dx-fh);
+    font-size: 15px;
+    padding-top: 12px;
+    border-top: 1px solid var(--dx-line);
+  }
+
+  .dx-cart__note {
+    font-size: 12px;
+    color: var(--dx-muted);
+  }
+
+  .dx-cart__go {
+    min-height: 54px;
+  }
+
+  .dx-cart__cont {
+    justify-self: center;
+    font-size: 13px;
+  }
+
+  .dx-cart__empty {
+    display: grid;
+    justify-items: center;
+    gap: 24px;
+    padding: clamp(32px, 5vw, 80px) 0 clamp(40px, 6vw, 100px);
+    text-align: center;
+    font-size: 16px;
+  }
+
+  @media (max-width: 899px) {
+    .dx-cart__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dx-cart__thead {
+      display: none;
+    }
+
+    .dx-cart__row {
+      grid-template-columns: 88px minmax(0, 1fr) auto;
+      grid-template-areas: 'img info total' 'img qty qty';
+      gap: 12px 16px;
+      align-items: start;
+    }
+
+    .dx-cart__img { grid-area: img; }
+    .dx-cart__info { grid-area: info; }
+    .dx-cart__qty { grid-area: qty; grid-auto-flow: column; align-items: center; justify-content: start; gap: 18px; }
+    .dx-cart__total { grid-area: total; }
+
+    .dx-cart__sum {
+      position: static;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Cart",
+  "class": "dx-cart-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Your cart" },
+    { "type": "checkbox", "id": "show_note", "label": "Show order note", "default": false },
+    { "type": "text", "id": "tax_note", "label": "Tax note", "default": "Taxes and shipping are calculated at checkout." },
+    { "type": "text", "id": "checkout_label", "label": "Checkout button", "default": "Check out" },
+    { "type": "checkbox", "id": "show_wallets", "label": "Show express checkout buttons", "default": true },
+    { "type": "text", "id": "empty_text", "label": "Empty cart text", "default": "Your cart is empty." },
+    { "type": "text", "id": "empty_cta", "label": "Empty cart button", "default": "Continue shopping" },
+    { "type": "url", "id": "empty_link", "label": "Empty cart link" }
+  ],
+  "enabled_on": { "templates": ["cart"] }
+}
+{% endschema %}

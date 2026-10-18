@@ -1,0 +1,612 @@
+{%- comment -%}
+  DUEXBROX collection page (All Products, T-Shirts, Hoodies, Pants, Shorts...).
+  Native Shopify storefront filtering: availability + price come from collection.filters
+  (enable them in Search & Discovery). Works without JS (form GET), JS updates in place.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign active_count = 0
+  for filter in collection.filters
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+  assign sort = collection.sort_by | default: collection.default_sort_by
+-%}
+{%- paginate collection.products by s.per_page -%}
+  <div class="dx dx-col" data-dx-col data-section="{{ section.id }}" data-url="{{ collection.url }}">
+    <div class="dx-wrap">
+      {%- if s.breadcrumb -%}
+        <nav class="dx-crumb" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><a href="{{ routes.collections_url }}">Collections</a></li>
+            <li aria-current="page">{{ collection.title | escape }}</li>
+          </ol>
+        </nav>
+      {%- endif -%}
+
+      <h1 class="dx-col__title">{{ collection.title | escape }}</h1>
+      {%- if s.show_description and collection.description != blank -%}
+        <div class="dx-col__desc dx-rte">{{ collection.description }}</div>
+      {%- endif -%}
+
+      <div class="dx-col__bar">
+        <button type="button" class="dx-col__ftoggle" data-dx-ftoggle aria-expanded="false" aria-controls="DxFlt-{{ section.id }}">
+          Filter{% if active_count > 0 %} ({{ active_count }}){% endif %}
+        </button>
+        <p class="dx-col__count" data-dx-count role="status">
+          {{ collection.products_count }} {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+        </p>
+      </div>
+
+      <div class="dx-col__body">
+        <aside class="dx-flt" id="DxFlt-{{ section.id }}" aria-label="Filters">
+          <div class="dx-flt__head">
+            <p class="dx-flt__title">Filter</p>
+            <button type="button" class="dx-flt__close" data-dx-fclose aria-label="Close filters">
+              {%- render 'dx-icon', name: 'close' -%}
+            </button>
+          </div>
+          <form class="dx-flt__form" data-dx-filter-form action="{{ collection.url }}" method="get">
+            {%- if collection.sort_by != blank -%}
+              <input type="hidden" name="sort_by" value="{{ sort }}">
+            {%- endif -%}
+            {%- for filter in collection.filters -%}
+              {%- liquid
+                assign open = s.filters_open
+                if filter.active_values.size > 0
+                  assign open = true
+                endif
+                if filter.type == 'price_range'
+                  if filter.min_value.value != null or filter.max_value.value != null
+                    assign open = true
+                  endif
+                endif
+              -%}
+              <details class="dx-flt__grp" data-grp="{{ filter.param_name | handle }}" {% if open %}open{% endif %}>
+                <summary class="dx-flt__sum">
+                  <span>{{ filter.label | escape }}</span>
+                  <span class="dx-acc__icon" aria-hidden="true"></span>
+                </summary>
+                <div class="dx-flt__body">
+                  {%- case filter.type -%}
+                    {%- when 'list', 'boolean' -%}
+                      <ul class="dx-flt__list" role="list">
+                        {%- for value in filter.values -%}
+                          {%- assign off = false -%}
+                          {%- if value.count == 0 and value.active == false -%}{%- assign off = true -%}{%- endif -%}
+                          <li>
+                            <label class="dx-chk{% if off %} is-off{% endif %}">
+                              <input
+                                type="checkbox"
+                                name="{{ value.param_name }}"
+                                value="{{ value.value }}"
+                                {% if value.active %}checked{% endif %}
+                                {% if off %}disabled{% endif %}
+                              >
+                              <span class="dx-chk__box" aria-hidden="true"></span>
+                              <span>{{ value.label | escape }} ({{ value.count }})</span>
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- when 'price_range' -%}
+                      {%- liquid
+                        assign max_raw = filter.range_max | divided_by: 100.0 | ceil
+                        assign cur_min = filter.min_value.value | divided_by: 100.0 | floor
+                        assign cur_max = max_raw
+                        if filter.max_value.value != null
+                          assign cur_max = filter.max_value.value | divided_by: 100.0 | ceil
+                        endif
+                      -%}
+                      <div class="dx-price" data-dx-price data-max="{{ max_raw }}">
+                        <div class="dx-price__track" aria-hidden="true">
+                          <span class="dx-price__fill" data-dx-fill></span>
+                        </div>
+                        <input type="range" class="dx-price__range" min="0" max="{{ max_raw }}" step="1" value="{{ cur_min }}" data-dx-rmin aria-label="Minimum price">
+                        <input type="range" class="dx-price__range" min="0" max="{{ max_raw }}" step="1" value="{{ cur_max }}" data-dx-rmax aria-label="Maximum price">
+                        <div class="dx-price__fields">
+                          <label>
+                            <span>From</span>
+                            <span class="dx-price__box">
+                              <span class="dx-price__cur">{{ cart.currency.iso_code }}</span>
+                              <input
+                                type="number"
+                                inputmode="numeric"
+                                name="{{ filter.min_value.param_name }}"
+                                min="0"
+                                max="{{ max_raw }}"
+                                placeholder="0"
+                                {% if filter.min_value.value != null %}value="{{ cur_min }}"{% endif %}
+                                data-dx-nmin
+                              >
+                            </span>
+                          </label>
+                          <label>
+                            <span>To</span>
+                            <span class="dx-price__box">
+                              <span class="dx-price__cur">{{ cart.currency.iso_code }}</span>
+                              <input
+                                type="number"
+                                inputmode="numeric"
+                                name="{{ filter.max_value.param_name }}"
+                                min="0"
+                                max="{{ max_raw }}"
+                                placeholder="{{ max_raw }}"
+                                {% if filter.max_value.value != null %}value="{{ cur_max }}"{% endif %}
+                                data-dx-nmax
+                              >
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                  {%- endcase -%}
+                </div>
+              </details>
+            {%- else -%}
+              {%- if request.design_mode -%}
+                <p class="dx-flt__note">Turn on Availability and Price filters in Shopify Admin &gt; Apps &gt; Search &amp; Discovery &gt; Filters.</p>
+              {%- endif -%}
+            {%- endfor -%}
+            <noscript><button type="submit" class="dx-btn">Apply</button></noscript>
+          </form>
+        </aside>
+
+        <div class="dx-col__main" data-dx-results>
+          {%- if active_count > 0 -%}
+            <div class="dx-chips">
+              {%- for filter in collection.filters -%}
+                {%- for value in filter.active_values -%}
+                  <a href="{{ value.url_to_remove }}" class="dx-chip" data-dx-link aria-label="Remove filter {{ value.label | escape }}">
+                    {{ value.label | escape }} {%- render 'dx-icon', name: 'close' -%}
+                  </a>
+                {%- endfor -%}
+                {%- if filter.type == 'price_range' -%}
+                  {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+                    <a href="{{ filter.url_to_remove }}" class="dx-chip" data-dx-link aria-label="Remove price filter">
+                      {{- filter.min_value.value | default: 0 | money_without_currency }} - {{ filter.max_value.value | default: filter.range_max | money_without_currency -}}
+                      {%- render 'dx-icon', name: 'close' -%}
+                    </a>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              <a href="{{ collection.url }}{% if collection.sort_by != blank %}?sort_by={{ sort }}{% endif %}" class="dx-chips__clear dx-ul dx-ul--on" data-dx-link>Clear all</a>
+            </div>
+          {%- endif -%}
+
+          {%- if collection.products.size > 0 -%}
+            <ul class="dx-col__grid" role="list">
+              {%- for product in collection.products -%}
+                <li class="dx-rv" style="--dx-d: {{ forloop.index0 | modulo: 4 | times: 0.06 }}s">
+                  {%- liquid
+                    assign lazy = true
+                    if forloop.index <= 4
+                      assign lazy = false
+                    endif
+                  -%}
+                  {%- render 'dx-card', product: product, lazy: lazy, sizes: '(min-width: 1200px) 18vw, (min-width: 900px) 24vw, 46vw' -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- else -%}
+            <div class="dx-col__empty">
+              <p>No products match these filters.</p>
+              {%- if active_count > 0 -%}
+                <a href="{{ collection.url }}" class="dx-btn" data-dx-link>Clear all filters</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if paginate.pages > 1 -%}
+            <nav class="dx-pag" aria-label="Pagination">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" class="dx-pag__a" aria-label="Previous page">{%- render 'dx-icon', name: 'chev-left' -%}</a>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}
+                  <a href="{{ part.url }}" class="dx-pag__a">{{ part.title }}</a>
+                {%- elsif part.title == paginate.current_page -%}
+                  <span class="dx-pag__a is-on" aria-current="page">{{ part.title }}</span>
+                {%- else -%}
+                  <span class="dx-pag__a">{{ part.title }}</span>
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="dx-pag__a" aria-label="Next page">{%- render 'dx-icon', name: 'chev-right' -%}</a>
+              {%- endif -%}
+            </nav>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endpaginate -%}
+
+<script src="{{ 'dx-collection.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .dx-col {
+    padding-bottom: clamp(56px, 6vw, 110px);
+  }
+
+  .dx-col__title {
+    margin: clamp(48px, 6vw, 96px) 0 0;
+    text-align: center;
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(22px, 2vw, 36px);
+  }
+
+  .dx-col__desc {
+    max-width: 640px;
+    margin: 16px auto 0;
+    text-align: center;
+    color: #444;
+  }
+
+  .dx-col__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: clamp(40px, 5vw, 96px);
+    margin-bottom: clamp(20px, 2vw, 32px);
+  }
+
+  .dx-col__ftoggle {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: var(--dx-fh);
+    font-size: clamp(14px, 1vw, 18px);
+    cursor: default;
+  }
+
+  .dx-col__count {
+    font-size: 15px;
+    color: var(--dx-muted);
+  }
+
+  .dx-col__body {
+    display: grid;
+    grid-template-columns: clamp(200px, 18vw, 300px) minmax(0, 1fr);
+    gap: clamp(24px, 2vw, 40px);
+    align-items: start;
+  }
+
+  .dx-flt {
+    position: sticky;
+    top: 24px;
+  }
+
+  .dx-flt__head {
+    display: none;
+  }
+
+  .dx-flt__grp {
+    border: 0;
+  }
+
+  .dx-flt__sum {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--dx-fh);
+    font-size: clamp(13px, 0.9vw, 16px);
+  }
+
+  .dx-flt__sum::-webkit-details-marker {
+    display: none;
+  }
+
+  .dx-flt__grp:not([open]) .dx-acc__icon::after {
+    transform: rotate(90deg);
+  }
+
+  .dx-flt__grp[open] .dx-acc__icon::after {
+    transform: rotate(0deg);
+  }
+
+  .dx-flt__body {
+    padding-bottom: 28px;
+  }
+
+  .dx-flt__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+  }
+
+  .dx-flt__note {
+    font-size: 13px;
+    color: var(--dx-muted);
+  }
+
+  .dx-chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    position: relative;
+  }
+
+  .dx-chk input {
+    position: absolute;
+    opacity: 0;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .dx-chk__box {
+    width: 22px;
+    height: 22px;
+    border: 1px solid #cfcfcc;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+
+  .dx-chk input:checked + .dx-chk__box {
+    background: var(--dx-black);
+    border-color: var(--dx-black);
+  }
+
+  .dx-chk input:checked + .dx-chk__box::after {
+    content: '';
+    width: 6px;
+    height: 11px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: translateY(-1px) rotate(45deg);
+  }
+
+  .dx-chk input:focus-visible + .dx-chk__box {
+    outline: 2px solid var(--dx-black);
+    outline-offset: 2px;
+  }
+
+  .dx-chk.is-off {
+    color: #9a9a9a;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  .dx-chk.is-off .dx-chk__box {
+    background: #ececea;
+  }
+
+  /* Price slider */
+  .dx-price {
+    position: relative;
+    padding-top: 6px;
+  }
+
+  .dx-price__track {
+    position: relative;
+    height: 2px;
+    margin: 12px 10px;
+    background: #d5d5d2;
+  }
+
+  .dx-price__fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--dx-lo, 0%);
+    right: calc(100% - var(--dx-hi, 100%));
+    background: var(--dx-black);
+  }
+
+  .dx-price__range {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 7px;
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background: none;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .dx-price__range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--dx-black);
+    border: 0;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .dx-price__range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--dx-black);
+    border: 0;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .dx-price__range::-webkit-slider-runnable-track {
+    background: none;
+  }
+
+  .dx-price__range::-moz-range-track {
+    background: none;
+  }
+
+  .dx-price__fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .dx-price__fields label > span:first-child {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .dx-price__box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--dx-line);
+    padding: 0 14px;
+    min-height: 56px;
+  }
+
+  .dx-price__cur {
+    font-size: 14px;
+  }
+
+  .dx-price__box input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 16px;
+    text-align: right;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+
+  .dx-price__box:focus-within {
+    border-color: var(--dx-black);
+  }
+
+  .dx-price__box input::-webkit-outer-spin-button,
+  .dx-price__box input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Chips */
+  .dx-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-bottom: 24px;
+  }
+
+  .dx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border: 1px solid var(--dx-line);
+    border-radius: 999px;
+    font-size: 15px;
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+
+  .dx-chip:hover {
+    border-color: var(--dx-black);
+  }
+
+  .dx-chip svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .dx-chips__clear {
+    font-size: 15px;
+  }
+
+  @media (max-width: 899px) {
+    .dx-col__body {
+      grid-template-columns: 1fr;
+    }
+
+    .dx-col__ftoggle {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border: 1px solid var(--dx-black);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .dx-flt {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 70;
+      width: min(380px, 88vw);
+      background: #fff;
+      padding: 20px var(--dx-gutter) 40px;
+      overflow-y: auto;
+      transform: translateX(-102%);
+      transition: transform 0.45s var(--dx-ease);
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0);
+    }
+
+    .dx-col.is-flt .dx-flt {
+      transform: none;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+    }
+
+    .dx-flt__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--dx-line);
+    }
+
+    .dx-flt__title {
+      font-family: var(--dx-fh);
+      font-size: 16px;
+    }
+
+    .dx-flt__close {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .dx-flt__close svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Collection",
+  "class": "dx-col-section",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "checkbox", "id": "breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "checkbox", "id": "show_description", "label": "Show collection description", "default": false },
+    { "type": "checkbox", "id": "filters_open", "label": "Open filter groups by default", "default": false }
+  ]
+}
+{% endschema %}

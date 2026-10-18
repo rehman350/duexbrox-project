@@ -1,0 +1,197 @@
+{%- comment -%} DUEXBROX homepage hero: full-bleed image, centred statement, text-roll CTA, scroll cue. {%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+-%}
+<section
+  class="dx dx-hero dx-hero--{{ s.height }}"
+  style="--dx-ov: {{ s.overlay | divided_by: 100.0 }}; --dx-hero-fg: {{ s.text_color }}; --dx-hero-pos: {{ s.position }};"
+>
+  <div class="dx-hero__media">
+    {%- if s.image != blank -%}
+      {%- if s.image_mobile != blank -%}
+        <picture>
+          <source media="(max-width: 699px)" srcset="{{ s.image_mobile | image_url: width: 750 }} 750w, {{ s.image_mobile | image_url: width: 1100 }} 1100w, {{ s.image_mobile | image_url: width: 1500 }} 1500w" sizes="100vw">
+          {{ s.image | image_url: width: 3200 | image_tag: widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high', alt: s.image.alt | default: s.heading }}
+        </picture>
+      {%- else -%}
+        {{ s.image | image_url: width: 3200 | image_tag: widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high', alt: s.image.alt | default: s.heading }}
+      {%- endif -%}
+    {%- else -%}
+      {{ 'hero-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+    {%- endif -%}
+  </div>
+
+  <div class="dx-hero__body dx-wrap">
+    {%- if s.heading != blank -%}
+      <h1 class="dx-hero__h dx-rv">{{ s.heading | escape }}</h1>
+    {%- endif -%}
+    {%- if s.text != blank -%}
+      <p class="dx-hero__p dx-rv" style="--dx-d: .12s">{{ s.text | escape }}</p>
+    {%- endif -%}
+    {%- if s.cta_label != blank -%}
+      <div class="dx-hero__cta dx-rv" style="--dx-d: .24s">
+        {%- render 'dx-roll', label: s.cta_label, url: s.cta_link -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if s.show_scroll -%}
+    <a href="#" class="dx-hero__scroll" data-dx-next-section>
+      <span>{{ s.scroll_label | escape }}</span>
+      {%- render 'dx-icon', name: 'down' -%}
+    </a>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .dx-hero {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: var(--dx-hero-fg, #fff);
+    background: #2a2a2a;
+    min-height: clamp(560px, 46vw, calc(100svh - 40px));
+  }
+
+  .dx-hero--full {
+    min-height: calc(100svh - 40px);
+  }
+
+  .dx-hero--tall {
+    min-height: clamp(620px, 60vw, calc(100svh - 40px));
+  }
+
+  .dx-hero__media,
+  .dx-hero__media picture {
+    position: absolute;
+    inset: 0;
+  }
+
+  .dx-hero__media img,
+  .dx-hero__media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--dx-hero-pos, center);
+  }
+
+  .dx-hero__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, calc(var(--dx-ov) * 0.6)) 0%, rgba(0, 0, 0, var(--dx-ov)) 100%);
+  }
+
+  .dx-hero__body {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding-block: calc(var(--dx-hd-h, 76px) + 24px) 64px;
+  }
+
+  .dx-hero__h {
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(26px, 3.6vw, 64px);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  .dx-hero__p {
+    margin: clamp(12px, 1.4vw, 22px) auto 0;
+    max-width: 62ch;
+    font-size: clamp(12px, 0.95vw, 17px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+
+  .dx-hero__cta {
+    margin-top: clamp(28px, 4vw, 64px);
+  }
+
+  .dx-hero__cta .dx-roll {
+    font-family: var(--dx-fb);
+    font-size: clamp(12px, 0.9vw, 16px);
+    letter-spacing: 0.1em;
+  }
+
+  .dx-hero__scroll {
+    position: absolute;
+    z-index: 1;
+    right: var(--dx-gutter);
+    bottom: clamp(60px, 9vw, 180px);
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .dx-hero__scroll svg {
+    width: 18px;
+    height: 18px;
+    animation: dx-float 1.8s ease-in-out infinite;
+  }
+
+  @keyframes dx-float {
+    0%, 100% { transform: translateY(-3px); }
+    50% { transform: translateY(4px); }
+  }
+
+  @media (max-width: 699px) {
+    .dx-hero {
+      min-height: min(86svh, 720px);
+    }
+
+    .dx-hero__scroll {
+      right: 50%;
+      transform: translateX(50%);
+      bottom: 22px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Hero",
+  "class": "dx-hero-section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Recommended 2400 x 1100 px or larger." },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (optional)", "info": "Portrait 1100 x 1600 px." },
+    {
+      "type": "select", "id": "position", "label": "Image focus",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select", "id": "height", "label": "Height",
+      "options": [
+        { "value": "ref", "label": "Reference" },
+        { "value": "tall", "label": "Tall" },
+        { "value": "full", "label": "Full screen" }
+      ],
+      "default": "ref"
+    },
+    { "type": "range", "id": "overlay", "label": "Image overlay", "min": 0, "max": 70, "step": 5, "unit": "%", "default": 25 },
+    { "type": "color", "id": "text_color", "label": "Text colour", "default": "#ffffff" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "PRESENCE OVER NOISE" },
+    { "type": "text", "id": "text", "label": "Text", "default": "DESIGNED FOR THOSE WHO DON'T NEED TO BE THE LOUDEST TO BE NOTICED." },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "SHOP COLLECTION 01" },
+    { "type": "url", "id": "cta_link", "label": "Button link", "default": "/collections/all" },
+    { "type": "checkbox", "id": "show_scroll", "label": "Show scroll indicator", "default": true },
+    { "type": "text", "id": "scroll_label", "label": "Scroll label", "default": "SCROLL" }
+  ],
+  "presets": [{ "name": "DX Hero" }]
+}
+{% endschema %}

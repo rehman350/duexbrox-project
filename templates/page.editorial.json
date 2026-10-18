@@ -1,0 +1,112 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "dx-editorial",
+      "blocks": {
+        "image_1": {
+          "type": "image",
+          "settings": {
+            "shape": "portrait",
+            "link": ""
+          }
+        },
+        "image_2": {
+          "type": "image",
+          "settings": {
+            "shape": "landscape",
+            "link": ""
+          }
+        },
+        "image_3": {
+          "type": "image",
+          "settings": {
+            "shape": "landscape",
+            "link": ""
+          }
+        },
+        "image_4": {
+          "type": "image",
+          "settings": {
+            "shape": "portrait",
+            "link": ""
+          }
+        },
+        "image_5": {
+          "type": "image",
+          "settings": {
+            "shape": "portrait",
+            "link": ""
+          }
+        },
+        "image_6": {
+          "type": "image",
+          "settings": {
+            "shape": "portrait",
+            "link": ""
+          }
+        },
+        "image_7": {
+          "type": "image",
+          "settings": {
+            "shape": "portrait",
+            "link": ""
+          }
+        },
+        "image_8": {
+          "type": "image",
+          "settings": {
+            "shape": "landscape",
+            "link": ""
+          }
+        },
+        "image_9": {
+          "type": "image",
+          "settings": {
+            "shape": "landscape",
+            "link": ""
+          }
+        },
+        "image_10": {
+          "type": "image",
+          "settings": {
+            "shape": "portrait",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_1",
+        "image_2",
+        "image_3",
+        "image_4",
+        "image_5",
+        "image_6",
+        "image_7",
+        "image_8",
+        "image_9",
+        "image_10"
+      ],
+      "settings": {
+        "layout": "masonry",
+        "columns": 4,
+        "heading": "EDITORIAL",
+        "page_title": true,
+        "subtitle": "Campaign photography and storytelling.",
+        "link_label": "",
+        "link": ""
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

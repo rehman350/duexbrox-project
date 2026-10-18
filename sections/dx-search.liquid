@@ -1,0 +1,130 @@
+{%- comment -%} DUEXBROX search results: products as dx cards, pages/articles as a simple list. {%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- paginate search.results by s.per_page -%}
+  <div class="dx dx-sr-page">
+    <div class="dx-wrap">
+      <h1 class="dx-sr-page__h">{{ s.heading | escape }}</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="dx-sr-page__form">
+        <div class="dx-fld">
+          <label for="DxSearchQ" class="dx-sr">Search</label>
+          <div class="dx-fld__box dx-sr-page__box">
+            <input id="DxSearchQ" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ s.placeholder | escape }}" autocomplete="off">
+            <input type="hidden" name="options[prefix]" value="last">
+            <button type="submit" class="dx-sr-page__go" aria-label="Search">{%- render 'dx-icon', name: 'arrow' -%}</button>
+          </div>
+        </div>
+      </form>
+
+      {%- if search.performed -%}
+        <p class="dx-sr-page__count" role="status">
+          {{ search.results_count }} {% if search.results_count == 1 %}result{% else %}results{% endif %} for &ldquo;{{ search.terms | escape }}&rdquo;
+        </p>
+        {%- assign prods = search.results | where: 'object_type', 'product' -%}
+        {%- assign others = search.results | where: 'object_type', 'page' -%}
+        {%- assign articles = search.results | where: 'object_type', 'article' -%}
+        {%- if prods.size > 0 -%}
+          <ul class="dx-col__grid dx-sr-page__grid" role="list">
+            {%- for item in prods -%}
+              <li>{%- render 'dx-card', product: item -%}</li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+        {%- if others.size > 0 or articles.size > 0 -%}
+          <ul class="dx-sr-page__list" role="list">
+            {%- for item in others -%}<li><a href="{{ item.url }}" class="dx-ul">{{ item.title | escape }}</a></li>{%- endfor -%}
+            {%- for item in articles -%}<li><a href="{{ item.url }}" class="dx-ul">{{ item.title | escape }}</a></li>{%- endfor -%}
+          </ul>
+        {%- endif -%}
+        {%- if search.results_count == 0 -%}
+          <div class="dx-sr-page__empty">
+            <p>Nothing found. Try another word, or browse everything.</p>
+            <a href="{{ routes.all_products_collection_url }}" class="dx-btn">Shop all</a>
+          </div>
+        {%- endif -%}
+        {%- if paginate.pages > 1 -%}
+          <nav class="dx-pag" aria-label="Pagination">
+            {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}" class="dx-pag__a" aria-label="Previous page">{%- render 'dx-icon', name: 'chev-left' -%}</a>{%- endif -%}
+            <span class="dx-pag__a is-on" aria-current="page">{{ paginate.current_page }}</span>
+            {%- if paginate.next -%}<a href="{{ paginate.next.url }}" class="dx-pag__a" aria-label="Next page">{%- render 'dx-icon', name: 'chev-right' -%}</a>{%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+{%- endpaginate -%}
+
+{% stylesheet %}
+  .dx-sr-page {
+    padding-block: clamp(48px, 6vw, 96px) clamp(56px, 6vw, 110px);
+  }
+
+  .dx-sr-page__h {
+    text-align: center;
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(22px, 2vw, 36px);
+  }
+
+  .dx-sr-page__form {
+    max-width: 640px;
+    margin: clamp(24px, 3vw, 44px) auto clamp(32px, 4vw, 60px);
+  }
+
+  .dx-sr-page__box {
+    display: flex;
+    border-bottom: 1px solid var(--dx-black);
+  }
+
+  .dx-sr-page__box input[type='search'] {
+    border: 0;
+    padding-inline: 0;
+    font-size: 18px;
+  }
+
+  .dx-sr-page__go {
+    width: 48px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  .dx-sr-page__go svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dx-sr-page__count {
+    margin-bottom: 28px;
+    color: var(--dx-muted);
+  }
+
+  .dx-sr-page__list {
+    list-style: none;
+    padding: 0;
+    margin: 40px 0 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  .dx-sr-page__empty {
+    display: grid;
+    justify-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Search",
+  "class": "dx-search-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Search" },
+    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Search products" },
+    { "type": "range", "id": "per_page", "label": "Results per page", "min": 8, "max": 48, "step": 4, "default": 24 }
+  ],
+  "enabled_on": { "templates": ["search"] }
+}
+{% endschema %}

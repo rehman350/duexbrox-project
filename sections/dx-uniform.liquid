@@ -1,0 +1,207 @@
+{%- comment -%}
+  DUEXBROX individual Uniform page.
+  - On the metaobject template (templates/metaobject/dx_uniform.json) it reads the current dx_uniform entry.
+  - On a page (templates/page.uniform.json) it shows the Uniform block whose "Page" matches the
+    current page, so one template serves all six uniforms.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign hero = null
+  assign number = ''
+  assign products = null
+  assign found = false
+  assign current_block = null
+
+  if metaobject != blank and metaobject.system.type == 'dx_uniform'
+    assign hero = metaobject.image.value
+    assign number = metaobject.number.value
+    assign products = metaobject.products.value
+    assign found = true
+  else
+    for block in section.blocks
+      if block.settings.page != blank and block.settings.page.handle == page.handle
+        assign hero = block.settings.image
+        assign number = block.settings.number
+        assign products = block.settings.products
+        assign current_block = block
+        assign found = true
+        break
+      endif
+    endfor
+    if found == false and section.blocks.size > 0 and request.design_mode
+      assign current_block = section.blocks.first
+      assign hero = current_block.settings.image
+      assign number = current_block.settings.number
+      assign products = current_block.settings.products
+    endif
+  endif
+-%}
+<div class="dx dx-uf" {% if current_block %}{{ current_block.shopify_attributes }}{% endif %}>
+  <div class="dx-media dx-uf__hero">
+    {%- if hero != blank -%}
+      {{ hero | image_url: width: 3200 | image_tag: widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high', alt: hero.alt | default: '' }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'dx-ph' }}
+    {%- endif -%}
+  </div>
+
+  <div class="dx-wrap">
+    <h1 class="dx-h dx-uf__h">{{ s.prefix | escape }} {{ number | escape }}</h1>
+    <p class="dx-uf__sub">{{ s.subtitle | escape }}</p>
+
+    <ul class="dx-uf__grid" role="list">
+      {%- if products != blank and products.size > 0 -%}
+        {%- for p in products -%}
+          <li class="dx-uf__item dx-rv" style="--dx-d: {{ forloop.index0 | times: 0.1 }}s">
+            <a href="{{ p.url }}" class="dx-media dx-card__media dx-uf__media">
+              {%- if p.featured_media -%}
+                {{ p.featured_media.preview_image | image_url: width: 1200 | image_tag: widths: '400,600,800,1000,1200', sizes: '(min-width: 900px) 380px, 50vw', loading: 'lazy', alt: p.featured_media.alt | default: p.title, class: 'dx-card__main' }}
+              {%- else -%}
+                {{ 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+              {%- endif -%}
+            </a>
+            <div class="dx-uf__row">
+              <h2 class="dx-uf__t">{{ p.title | escape }}</h2>
+              <a href="{{ p.url }}" class="dx-uf__shop dx-ul dx-ul--on">{{ s.cta | escape }}<span class="dx-sr">: {{ p.title | escape }}</span></a>
+            </div>
+            <p class="dx-uf__p">{{ p.price | money_without_currency }}</p>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..2) -%}
+          <li class="dx-uf__item">
+            <div class="dx-media dx-card__media">{{ 'product-apparel-' | append: i | placeholder_svg_tag: 'dx-ph' }}</div>
+            <div class="dx-uf__row"><p class="dx-uf__t">Assign products</p></div>
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+    {%- if s.back_label != blank -%}
+      <div class="dx-uf__back">{%- render 'dx-roll', label: s.back_label, url: s.back_link -%}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .dx-uf {
+    padding-bottom: clamp(56px, 6vw, 110px);
+  }
+
+  .dx-uf__hero {
+    aspect-ratio: 2.74 / 1;
+    max-height: 82svh;
+    width: 100%;
+  }
+
+  .dx-uf__h {
+    padding-top: clamp(40px, 5vw, 80px);
+    font-size: clamp(22px, 2vw, 36px);
+    letter-spacing: 0.04em;
+  }
+
+  .dx-uf__sub {
+    margin-top: 14px;
+    font-size: clamp(13px, 1vw, 18px);
+    text-transform: uppercase;
+    color: #4a4a4a;
+  }
+
+  .dx-uf__grid {
+    list-style: none;
+    margin: clamp(32px, 4vw, 64px) auto 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(12px, 1vw, 16px);
+  }
+
+  .dx-uf__item {
+    width: min(100%, 370px);
+    flex: 0 1 370px;
+  }
+
+  .dx-uf__media {
+    display: block;
+    aspect-ratio: 370 / 470;
+  }
+
+  .dx-uf__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .dx-uf__t {
+    font-family: var(--dx-fb);
+    font-weight: 700;
+    font-size: clamp(13px, 0.95vw, 17px);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .dx-uf__shop {
+    flex: none;
+    font-family: var(--dx-fb);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .dx-uf__p {
+    margin-top: 10px;
+    font-size: 15px;
+    color: #444;
+  }
+
+  .dx-uf__back {
+    margin-top: clamp(40px, 5vw, 72px);
+    text-align: center;
+  }
+
+  @media (max-width: 599px) {
+    .dx-uf__hero {
+      aspect-ratio: 4 / 5;
+    }
+
+    .dx-uf__item {
+      flex-basis: calc(50% - 6px);
+    }
+
+    .dx-uf__row {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Uniform detail",
+  "class": "dx-uf-section",
+  "max_blocks": 12,
+  "settings": [
+    { "type": "paragraph", "content": "On the metaobject template this reads the dx_uniform entry. On page templates add one Uniform block per uniform page." },
+    { "type": "text", "id": "prefix", "label": "Heading prefix", "default": "UNIFORM" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "SHOP YOUR COMPLETE UNIFORM HERE" },
+    { "type": "text", "id": "cta", "label": "Product link label", "default": "SHOP THIS ITEM" },
+    { "type": "text", "id": "back_label", "label": "Back link label", "default": "ALL UNIFORMS" },
+    { "type": "url", "id": "back_link", "label": "Back link" }
+  ],
+  "blocks": [
+    {
+      "type": "uniform",
+      "name": "Uniform",
+      "settings": [
+        { "type": "page", "id": "page", "label": "Page", "info": "The Shopify page this uniform appears on (e.g. Uniform 01)." },
+        { "type": "text", "id": "number", "label": "Number", "default": "01" },
+        { "type": "image_picker", "id": "image", "label": "Hero image", "info": "Wide, at least 2400 x 900 px." },
+        { "type": "product_list", "id": "products", "label": "Products", "limit": 4 }
+      ]
+    }
+  ]
+}
+{% endschema %}

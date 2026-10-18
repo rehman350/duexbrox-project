@@ -1,0 +1,62 @@
+{%- comment -%}
+  Shared Shopify contact form (Contact page + FAQ). Messages go to the store's sender email
+  (Settings > Notifications). Each field has its own animated underline.
+  @param {string} id - unique form id
+  @param {string} [heading]
+  @param {string} [button] - submit label
+  @param {string} [ok] - success message
+{%- endcomment -%}
+{%- assign button = button | default: 'Send message' -%}
+<div class="dx-cf" id="{{ id }}-wrap">
+  {%- if heading != blank -%}<h2 class="dx-cf__h">{{ heading | escape }}</h2>{%- endif -%}
+  {%- form 'contact', id: id, class: 'dx-cf__form', novalidate: 'novalidate', data-dx-validate: 'true' -%}
+    {%- if form.posted_successfully? -%}
+      <p class="dx-msg dx-msg--ok dx-cf__msg" role="status" tabindex="-1" autofocus>{{ ok | default: "Thanks for reaching out. We'll get back to you soon." | escape }}</p>
+    {%- elsif form.errors -%}
+      <div class="dx-msg dx-msg--err dx-cf__msg" role="alert" tabindex="-1" autofocus>{{ form.errors | default_errors }}</div>
+    {%- endif -%}
+    <div class="dx-form">
+      <div class="dx-fld">
+        <label for="{{ id }}-name">Your Name</label>
+        <div class="dx-fld__box">
+          <input id="{{ id }}-name" type="text" name="contact[name]" autocomplete="name" placeholder="Enter name" value="{{ form.name }}">
+        </div>
+      </div>
+      <div class="dx-fld{% if form.errors contains 'email' %} is-invalid{% endif %}">
+        <label for="{{ id }}-email">Your Email<span class="dx-req" aria-hidden="true">*</span></label>
+        <div class="dx-fld__box">
+          <input
+            id="{{ id }}-email"
+            type="email"
+            name="contact[email]"
+            autocomplete="email"
+            placeholder="Enter email address"
+            value="{{ form.email }}"
+            required
+            aria-required="true"
+            aria-describedby="{{ id }}-email-err"
+          >
+        </div>
+        <p class="dx-fld__err" id="{{ id }}-email-err" data-required="Please enter your email." data-invalid="Please enter a valid email address."></p>
+      </div>
+      <div class="dx-fld dx-form__full{% if form.errors contains 'body' %} is-invalid{% endif %}">
+        <label for="{{ id }}-msg">Your Message<span class="dx-req" aria-hidden="true">*</span></label>
+        <div class="dx-fld__box">
+          <textarea
+            id="{{ id }}-msg"
+            name="contact[body]"
+            rows="5"
+            placeholder="Enter message"
+            required
+            aria-required="true"
+            aria-describedby="{{ id }}-msg-err"
+          >{{ form.body }}</textarea>
+        </div>
+        <p class="dx-fld__err" id="{{ id }}-msg-err" data-required="Please write a message." data-invalid="Please write a message."></p>
+      </div>
+      <div class="dx-form__full dx-cf__actions">
+        <button type="submit" class="dx-btn dx-cf__btn">{{ button | escape }}</button>
+      </div>
+    </div>
+  {%- endform -%}
+</div>

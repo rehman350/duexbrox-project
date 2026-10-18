@@ -1,0 +1,344 @@
+{%- comment -%}
+  DUEXBROX header: wordmark left, nav centre, CART ( n ) right.
+  Homepage: transparent over the hero, hides on scroll down, returns white on scroll up.
+  Nav items come from the chosen menu, or from the Link blocks when no menu is picked.
+{%- endcomment -%}
+{%- liquid
+  assign transparent = false
+  if section.settings.transparent_home and template.name == 'index'
+    assign transparent = true
+  endif
+  assign menu = section.settings.menu
+  assign use_menu = false
+  if menu != blank and menu.links.size > 0
+    assign use_menu = true
+  endif
+  assign links = section.blocks | where: 'type', 'link'
+-%}
+
+{%- capture nav_items -%}
+  {%- if use_menu -%}
+    {%- for link in menu.links -%}
+      <li><a href="{{ link.url }}" class="dx-ul"{% if link.active %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+    {%- endfor -%}
+  {%- else -%}
+    {%- for block in links -%}
+      {%- liquid
+        assign active = false
+        if block.settings.link != blank and request.path == block.settings.link
+          assign active = true
+        endif
+      -%}
+      <li {{ block.shopify_attributes }}><a href="{{ block.settings.link | default: '#' }}" class="dx-ul"{% if active %} aria-current="page"{% endif %}>{{ block.settings.label | escape }}</a></li>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+<div
+  class="dx dx-hdr{% if transparent %} is-tp{% endif %}"
+  data-dx-header
+  style="--dx-hd-tp: {{ section.settings.tp_color }};"
+>
+  <div class="dx-hd-wrap">
+    <header class="dx-hd">
+      <div class="dx-hd__in dx-wrap">
+        <button
+          type="button"
+          class="dx-hd__burger"
+          data-dx-menu-toggle
+          aria-expanded="false"
+          aria-controls="DxMenu-{{ section.id }}"
+        >
+          <span class="dx-sr">Menu</span>
+          <span class="dx-hd__bars" aria-hidden="true"><i></i><i></i></span>
+        </button>
+
+        <a href="{{ routes.root_url }}" class="dx-hd__logo" aria-label="{{ shop.name | escape }} home">
+          {%- if section.settings.logo != blank -%}
+            {{ section.settings.logo | image_url: width: 600 | image_tag: widths: '200,300,400,600', sizes: '(min-width: 900px) 200px, 140px', loading: 'eager', alt: shop.name, style: 'width: var(--dx-logo-w); height: auto;' }}
+          {%- else -%}
+            <span class="dx-hd__word">{{ section.settings.wordmark | default: shop.name | escape }}</span>
+          {%- endif -%}
+        </a>
+
+        <nav class="dx-hd__nav" aria-label="Main">
+          <ul>{{ nav_items }}</ul>
+        </nav>
+
+        <a href="{{ routes.cart_url }}" class="dx-hd__cart dx-ul" aria-label="Cart, {{ cart.item_count }} items">
+          <span>{{ section.settings.cart_label | escape }}</span>
+          <span class="dx-hd__sep" aria-hidden="true">|</span>
+          <span aria-hidden="true">( <span data-dx-cart-count>{{ cart.item_count }}</span> )</span>
+        </a>
+      </div>
+    </header>
+  </div>
+
+  <div class="dx-hd__menu" id="DxMenu-{{ section.id }}" data-dx-menu>
+    <nav aria-label="Mobile">
+      <ul class="dx-hd__mlist">{{ nav_items }}</ul>
+      <a href="{{ routes.cart_url }}" class="dx-hd__mcart">
+        {{ section.settings.cart_label | escape }} ( <span data-dx-cart-count>{{ cart.item_count }}</span> )
+      </a>
+    </nav>
+  </div>
+</div>
+
+<style>
+  #shopify-section-{{ section.id }} { --dx-logo-w: {{ section.settings.logo_width }}px; }
+</style>
+
+{% stylesheet %}
+  .dx-hdr {
+    position: relative;
+    z-index: 50;
+  }
+
+  .dx-hd-wrap {
+    position: relative;
+    min-height: var(--dx-hd-h, 76px);
+  }
+
+  .dx-hdr.is-tp .dx-hd-wrap {
+    min-height: 0;
+    height: 0;
+  }
+
+  .dx-hd {
+    position: relative;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 50;
+    background: #fff;
+    color: var(--dx-black);
+    border-bottom: 1px solid var(--dx-line);
+    transition: transform 0.45s var(--dx-ease), background-color 0.35s var(--dx-ease), color 0.35s var(--dx-ease),
+      border-color 0.35s var(--dx-ease);
+  }
+
+  .dx-hdr.is-tp .dx-hd {
+    position: absolute;
+  }
+
+  .dx-hdr.is-tp .dx-hd:not(.is-stuck) {
+    background: transparent;
+    color: var(--dx-hd-tp, #111);
+    border-color: transparent;
+  }
+
+  .dx-hd.is-stuck {
+    position: fixed !important;
+    transform: translateY(-101%);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  }
+
+  .dx-hd.is-stuck.is-up {
+    transform: none;
+  }
+
+  .dx-hd.is-instant {
+    transition: none;
+  }
+
+  .dx-hd__in {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    min-height: clamp(64px, 5.2vw, 96px);
+    gap: 16px;
+  }
+
+  .dx-hd__logo {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .dx-hd__word {
+    font-family: var(--dx-fb);
+    font-weight: 300;
+    font-size: clamp(22px, 1.9vw, 34px);
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  .dx-hd__nav ul {
+    display: flex;
+    gap: clamp(20px, 2.6vw, 48px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dx-hd__nav a,
+  .dx-hd__cart {
+    font-family: var(--dx-fb);
+    font-size: clamp(13px, 0.95vw, 17px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .dx-hd__cart {
+    justify-self: end;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    letter-spacing: 0.08em;
+  }
+
+  .dx-hd__sep {
+    opacity: 0.7;
+    font-size: 0.85em;
+  }
+
+  .dx-hd__burger {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin-left: -8px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    place-items: center;
+  }
+
+  .dx-hd__bars {
+    position: relative;
+    width: 22px;
+    height: 10px;
+    display: block;
+  }
+
+  .dx-hd__bars i {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.4s var(--dx-ease), top 0.4s var(--dx-ease);
+  }
+
+  .dx-hd__bars i:first-child { top: 0; }
+  .dx-hd__bars i:last-child { top: 8.5px; }
+
+  .dx-hdr.is-menu .dx-hd__bars i:first-child { top: 4.25px; transform: rotate(45deg); }
+  .dx-hdr.is-menu .dx-hd__bars i:last-child { top: 4.25px; transform: rotate(-45deg); }
+
+  .dx-hd__menu {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: #fff;
+    padding: calc(var(--dx-hd-h, 76px) + 32px) var(--dx-gutter) 40px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px);
+    transition: opacity 0.4s var(--dx-ease), transform 0.4s var(--dx-ease), visibility 0s linear 0.4s;
+  }
+
+  .dx-hdr.is-menu .dx-hd__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 0.4s var(--dx-ease), transform 0.4s var(--dx-ease), visibility 0s;
+  }
+
+  .dx-hdr.is-menu .dx-hd {
+    background: #fff;
+    color: var(--dx-black);
+    position: fixed;
+    transform: none;
+  }
+
+  .dx-hd__mlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .dx-hd__mlist a {
+    display: inline-block;
+    padding: 10px 0;
+    font-family: var(--dx-fh);
+    font-size: clamp(24px, 7vw, 40px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .dx-hd__mcart {
+    display: inline-block;
+    margin-top: 32px;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 899px) {
+    .dx-hd__in {
+      grid-template-columns: 1fr auto 1fr;
+    }
+
+    .dx-hd__burger {
+      display: grid;
+      justify-self: start;
+    }
+
+    .dx-hd__logo {
+      justify-self: center;
+    }
+
+    .dx-hd__nav {
+      display: none;
+    }
+
+    .dx-hd__cart > span:first-child {
+      font-size: 12px;
+    }
+
+    .dx-hd__sep {
+      display: none;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .dx-hd__menu {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Header",
+  "class": "dx-header-section",
+  "enabled_on": { "groups": ["header"] },
+  "max_blocks": 8,
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo image (optional)", "info": "Leave empty to use the text wordmark." },
+    { "type": "range", "id": "logo_width", "label": "Logo width", "min": 80, "max": 300, "step": 5, "unit": "px", "default": 150 },
+    { "type": "text", "id": "wordmark", "label": "Wordmark text", "default": "DUEXBROX" },
+    { "type": "link_list", "id": "menu", "label": "Menu (optional)", "info": "When a menu is chosen it replaces the Link blocks below." },
+    { "type": "text", "id": "cart_label", "label": "Cart label", "default": "CART" },
+    { "type": "header", "content": "Homepage" },
+    { "type": "checkbox", "id": "transparent_home", "label": "Transparent header over the homepage hero", "default": true },
+    { "type": "color", "id": "tp_color", "label": "Transparent header text colour", "default": "#111111" }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Link",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "SHOP" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "DX Header" }]
+}
+{% endschema %}
