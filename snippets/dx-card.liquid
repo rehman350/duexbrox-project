@@ -27,14 +27,23 @@
     {%- unless product.available -%}
       <span class="dx-card__badge">Sold out</span>
     {%- endunless -%}
-    <div class="dx-media dx-card__media{% if alt %} has-alt{% endif %}">
+    {%- liquid
+      assign pv_back = false
+      if main == blank and settings.dx_preview_images and product.handle contains '-tee'
+        assign pv_back = true
+      endif
+    -%}
+    <div class="dx-media dx-card__media{% if alt or pv_back %} has-alt{% endif %}">
       {%- if main -%}
         {{ main | image_url: width: 1200 | image_tag: widths: '300,450,600,800,1000,1200', sizes: sizes, loading: loading, class: 'dx-card__main', alt: main.alt | default: product.title }}
         {%- if alt -%}
           {{ alt | image_url: width: 1200 | image_tag: widths: '300,450,600,800,1000,1200', sizes: sizes, loading: 'lazy', class: 'dx-card__alt', alt: '' }}
         {%- endif -%}
       {%- else -%}
-        {%- render 'dx-ph', name: 'product-apparel-1', alt: product.title -%}
+        {%- render 'dx-ph', name: 'product-apparel-1', product: product, alt: product.title, class: 'dx-card__main' -%}
+        {%- if pv_back -%}
+          {%- render 'dx-ph', name: 'product-apparel-2', product: product, back: true, class: 'dx-card__alt' -%}
+        {%- endif -%}
       {%- endif -%}
     </div>
     <h3 class="dx-card__title">{{ product.title }}</h3>

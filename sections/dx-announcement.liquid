@@ -99,21 +99,16 @@
     font-weight: 500;
     letter-spacing: 0.02em;
     line-height: 40px;
-    opacity: 0;
     visibility: hidden;
-    transform: translateY(calc(var(--dx-ann-dir, 1) * 60%));
-    transition: opacity 0.5s var(--dx-ease), transform 0.5s var(--dx-ease), visibility 0s linear 0.5s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    will-change: transform;
   }
 
-  .dx-ann__item.is-on {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition: opacity 0.5s var(--dx-ease) 0.1s, transform 0.5s var(--dx-ease) 0.1s, visibility 0s;
-  }
-
+  .dx-ann__item.is-on,
   .dx-ann__item.is-out {
-    transform: translateY(calc(var(--dx-ann-dir, 1) * -60%));
+    visibility: visible;
   }
 
   @media (min-width: 900px) {

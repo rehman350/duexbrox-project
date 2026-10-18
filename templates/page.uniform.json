@@ -17,7 +17,10 @@
           "settings": {
             "page": "",
             "number": "01",
-            "products": []
+            "products": [],
+            "preview": "dx-pv-ufh-01.jpg",
+            "handles": "i-dont-say-hi-back-tee, the-cargo-short",
+            "page_handle": "uniform-01"
           }
         },
         "uniform_2": {
@@ -25,7 +28,10 @@
           "settings": {
             "page": "",
             "number": "02",
-            "products": []
+            "products": [],
+            "preview": "dx-pv-ufh-02.jpg",
+            "handles": "unapologetic-tee, leopard-leather-pants",
+            "page_handle": "uniform-02"
           }
         },
         "uniform_3": {
@@ -33,7 +39,10 @@
           "settings": {
             "page": "",
             "number": "03",
-            "products": []
+            "products": [],
+            "preview": "dx-pv-ufh-03.jpg",
+            "handles": "digital-tee, the-wide-cargo",
+            "page_handle": "uniform-03"
           }
         },
         "uniform_4": {
@@ -41,7 +50,10 @@
           "settings": {
             "page": "",
             "number": "04",
-            "products": []
+            "products": [],
+            "preview": "dx-pv-ufh-04.jpg",
+            "handles": "the-sherpa-zip, the-wide-cargo",
+            "page_handle": "uniform-04"
           }
         },
         "uniform_5": {
@@ -49,7 +61,10 @@
           "settings": {
             "page": "",
             "number": "05",
-            "products": []
+            "products": [],
+            "preview": "dx-pv-ufh-05.jpg",
+            "handles": "the-quote-tee, the-wide-cargo",
+            "page_handle": "uniform-05"
           }
         },
         "uniform_6": {
@@ -57,7 +72,10 @@
           "settings": {
             "page": "",
             "number": "06",
-            "products": []
+            "products": [],
+            "preview": "dx-pv-ufh-06.jpg",
+            "handles": "the-heavyweight-hoodie, the-cargo-short",
+            "page_handle": "uniform-06"
           }
         }
       },

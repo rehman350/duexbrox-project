@@ -44,7 +44,13 @@
     {%- for block in section.blocks limit: s.limit -%}
       <li class="dx-rv" style="--dx-d: {{ forloop.index0 | modulo: 4 | times: 0.08 }}s" {{ block.shopify_attributes }}>
         {%- assign b_no = block.settings.number | default: forloop.index -%}
-        {%- render 'dx-uniform-card', image: block.settings.image, number: b_no, products: block.settings.products, url: block.settings.link, index: forloop.index -%}
+        {%- liquid
+          assign b_url = block.settings.link
+          if b_url == blank
+            assign b_url = routes.root_url | append: 'pages/uniform-' | append: b_no | replace: '//', '/'
+          endif
+        -%}
+        {%- render 'dx-uniform-card', image: block.settings.image, preview: block.settings.preview, number: b_no, products: block.settings.products, handles: block.settings.handles, url: b_url, index: forloop.index -%}
       </li>
     {%- endfor -%}
   {%- endif -%}
@@ -182,8 +188,10 @@
       "settings": [
         { "type": "text", "id": "number", "label": "Number", "default": "01" },
         { "type": "image_picker", "id": "image", "label": "Lifestyle image", "info": "Portrait 3:4, at least 1200 x 1600 px." },
+        { "type": "text", "id": "preview", "label": "Temporary preview image", "info": "Bundled preview photo shown only while the image is empty. Clear it, or pick a real image, to remove it." },
         { "type": "product_list", "id": "products", "label": "Products in this outfit", "limit": 4, "info": "The card total is the sum of these products' prices." },
-        { "type": "url", "id": "link", "label": "Uniform page link", "info": "e.g. the page that uses the uniform template." }
+        { "type": "text", "id": "handles", "label": "Product handles (fallback)", "info": "Comma-separated product handles, used only while Products is empty, e.g. digital-tee, the-wide-cargo." },
+        { "type": "url", "id": "link", "label": "Uniform page link", "info": "Leave empty to link to /pages/uniform-<number>." }
       ]
     }
   ],

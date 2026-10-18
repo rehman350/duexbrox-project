@@ -39,11 +39,8 @@
         <li class="dx-ed__item dx-ed__item--{{ shape }} dx-rv" style="--dx-d: {{ forloop.index0 | modulo: 4 | times: 0.07 }}s" {{ block.shopify_attributes }}>
           {%- if b.link != blank -%}<a href="{{ b.link }}" class="dx-ed__link">{%- endif -%}
           <div class="dx-media dx-zoom dx-ed__media">
-            {%- if b.image != blank -%}
-              {{ b.image | image_url: width: 1600 | image_tag: widths: '400,600,800,1100,1600', sizes: sizes, loading: 'lazy', alt: b.image.alt | default: b.alt }}
-            {%- else -%}
-              {{ 'lifestyle-' | append: ph | placeholder_svg_tag: 'dx-ph' }}
-            {%- endif -%}
+            {%- assign ph_name = 'lifestyle-' | append: ph -%}
+            {%- render 'dx-img', image: b.image, preview: b.preview, ph: ph_name, widths: '400,600,800,1100,1600', sizes: sizes, alt: b.alt -%}
           </div>
           {%- if b.link != blank -%}</a>{%- endif -%}
         </li>
@@ -162,6 +159,7 @@
       "name": "Image",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "preview", "label": "Temporary preview image", "info": "Bundled preview photo shown only while Image is empty. Clear it, or pick a real image, to remove it." },
         { "type": "text", "id": "alt", "label": "Alt text (if the image has none)" },
         {
           "type": "select", "id": "shape", "label": "Shape (masonry)",

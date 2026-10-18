@@ -12,7 +12,7 @@
         {{ s.image | image_url: width: 3200 | image_tag: widths: '800,1200,1600,2000,2600,3200', sizes: '100vw', loading: s.loading, alt: s.image.alt | default: '' }}
       {%- endif -%}
     {%- else -%}
-      {{ 'lifestyle-2' | placeholder_svg_tag: 'dx-ph' }}
+      {%- render 'dx-img', preview: s.preview, ph: 'lifestyle-2', loading: s.loading -%}
     {%- endif -%}
   </div>
 </section>
@@ -48,6 +48,7 @@
   "settings": [
     { "type": "image_picker", "id": "image", "label": "Image", "info": "About hero: model on the right, open grey space on the left. 2400 x 1200 px." },
     { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (optional)" },
+    { "type": "text", "id": "preview", "label": "Temporary preview image", "info": "Bundled preview photo shown only while Image is empty. Clear it, or pick a real image, to remove it." },
     {
       "type": "select", "id": "ratio", "label": "Shape",
       "options": [

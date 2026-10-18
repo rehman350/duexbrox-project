@@ -16,70 +16,80 @@
           "type": "image",
           "settings": {
             "shape": "portrait",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-01.jpg"
           }
         },
         "image_2": {
           "type": "image",
           "settings": {
             "shape": "landscape",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-02.jpg"
           }
         },
         "image_3": {
           "type": "image",
           "settings": {
             "shape": "landscape",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-03.jpg"
           }
         },
         "image_4": {
           "type": "image",
           "settings": {
             "shape": "portrait",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-04.jpg"
           }
         },
         "image_5": {
           "type": "image",
           "settings": {
             "shape": "portrait",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-05.jpg"
           }
         },
         "image_6": {
           "type": "image",
           "settings": {
             "shape": "portrait",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-06.jpg"
           }
         },
         "image_7": {
           "type": "image",
           "settings": {
             "shape": "portrait",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-07.jpg"
           }
         },
         "image_8": {
           "type": "image",
           "settings": {
             "shape": "landscape",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-08.jpg"
           }
         },
         "image_9": {
           "type": "image",
           "settings": {
             "shape": "landscape",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-09.jpg"
           }
         },
         "image_10": {
           "type": "image",
           "settings": {
             "shape": "portrait",
-            "link": ""
+            "link": "",
+            "preview": "dx-pv-ed-10.jpg"
           }
         }
       },

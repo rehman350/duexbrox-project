@@ -1,0 +1,28 @@
+{%- comment -%}
+  DUEXBROX image with a temporary preview fallback.
+  Order: the merchant's image → the section's preview asset (while Theme settings → DUEXBROX →
+  "Show temporary preview images" is on) → the Shopify SVG placeholder.
+  @param {image} image
+  @param {string} [preview] - theme asset file name, e.g. dx-pv-hero.jpg
+  @param {string} [ph] - placeholder_svg_tag name
+  @param {number} [width] - largest rendition, default 1600
+  @param {string} [widths]
+  @param {string} [sizes]
+  @param {string} [loading] - default lazy
+  @param {string} [fetchpriority] - default auto
+  @param {string} [alt]
+  @param {string} [class]
+{%- endcomment -%}
+{%- liquid
+  assign w = width | default: 1600
+  assign ld = loading | default: 'lazy'
+  assign fp = fetchpriority | default: 'auto'
+  assign a = alt | default: image.alt | default: ''
+-%}
+{%- if image != blank -%}
+  {{ image | image_url: width: w | image_tag: widths: widths, sizes: sizes, loading: ld, fetchpriority: fp, alt: a, class: class }}
+{%- elsif preview != blank and settings.dx_preview_images -%}
+  <img src="{{ preview | asset_url }}" width="1600" height="1200" alt="{{ a | escape }}" loading="{{ ld }}" fetchpriority="{{ fp }}" class="dx-pv{% if class != blank %} {{ class }}{% endif %}">
+{%- else -%}
+  {{ ph | default: 'lifestyle-1' | placeholder_svg_tag: 'dx-ph' }}
+{%- endif -%}

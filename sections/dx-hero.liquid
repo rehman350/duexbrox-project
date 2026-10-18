@@ -17,7 +17,7 @@
         {{ s.image | image_url: width: 3200 | image_tag: widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high', alt: s.image.alt | default: s.heading }}
       {%- endif -%}
     {%- else -%}
-      {{ 'hero-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+      {%- render 'dx-img', preview: s.preview, ph: 'hero-apparel-1', loading: 'eager', fetchpriority: 'high', alt: s.heading -%}
     {%- endif -%}
   </div>
 
@@ -163,6 +163,7 @@
   "settings": [
     { "type": "image_picker", "id": "image", "label": "Image", "info": "Recommended 2400 x 1100 px or larger." },
     { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (optional)", "info": "Portrait 1100 x 1600 px." },
+    { "type": "text", "id": "preview", "label": "Temporary preview image", "info": "Bundled preview photo shown only while Image is empty. Clear it, or pick a real image, to remove it." },
     {
       "type": "select", "id": "position", "label": "Image focus",
       "options": [
