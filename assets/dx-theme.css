@@ -392,6 +392,12 @@ body {
   fill: #c3c3bf;
 }
 
+.dx-media > .dx-ph--img,
+.dx-ph--img {
+  background: #fff;
+  object-fit: contain;
+}
+
 .dx-zoom > img,
 .dx-zoom > svg {
   transition: transform 1s var(--dx-ease-out);

@@ -44,7 +44,7 @@
           {%- if img != blank -%}
             {{ img | image_url: width: 1400 | image_tag: widths: '400,600,800,1000,1400', sizes: '(min-width: 900px) 25vw, 50vw', loading: 'lazy', alt: img.alt | default: title }}
           {%- else -%}
-            {{ 'product-apparel-2' | placeholder_svg_tag: 'dx-ph' }}
+            {%- render 'dx-ph', name: 'product-apparel-2', alt: title -%}
           {%- endif -%}
         </div>
       </article>

@@ -66,8 +66,8 @@
             </figure>
           {%- endfor -%}
         {%- else -%}
-          <figure class="dx-pd__fig">{{ 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}</figure>
-          <figure class="dx-pd__fig">{{ 'product-apparel-2' | placeholder_svg_tag: 'dx-ph' }}</figure>
+          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-1', alt: product.title -%}</figure>
+          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-2' -%}</figure>
         {%- endif -%}
       </div>
 

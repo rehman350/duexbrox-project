@@ -57,7 +57,7 @@
               {%- if p.featured_media -%}
                 {{ p.featured_media.preview_image | image_url: width: 1200 | image_tag: widths: '400,600,800,1000,1200', sizes: '(min-width: 900px) 380px, 50vw', loading: 'lazy', alt: p.featured_media.alt | default: p.title, class: 'dx-card__main' }}
               {%- else -%}
-                {{ 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+                {%- render 'dx-ph', name: 'product-apparel-1', alt: p.title -%}
               {%- endif -%}
             </a>
             <div class="dx-uf__row">
@@ -70,7 +70,7 @@
       {%- else -%}
         {%- for i in (1..2) -%}
           <li class="dx-uf__item">
-            <div class="dx-media dx-card__media">{{ 'product-apparel-' | append: i | placeholder_svg_tag: 'dx-ph' }}</div>
+            <div class="dx-media dx-card__media">{%- assign ph_name = 'product-apparel-' | append: i -%}{%- render 'dx-ph', name: ph_name -%}</div>
             <div class="dx-uf__row"><p class="dx-uf__t">Assign products</p></div>
           </li>
         {%- endfor -%}

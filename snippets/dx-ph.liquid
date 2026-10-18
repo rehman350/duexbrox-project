@@ -1,0 +1,15 @@
+{%- comment -%}
+  DUEXBROX product placeholder. While "Use test product image" is on (Theme settings → DUEXBROX),
+  products without photos show the test image instead of the Shopify SVG placeholder.
+  @param {string} name - placeholder_svg_tag name used when test images are off
+  @param {string} [alt]
+{%- endcomment -%}
+{%- if settings.dx_test_images -%}
+  {%- if settings.dx_test_image != blank -%}
+    {{ settings.dx_test_image | image_url: width: 1200 | image_tag: widths: '300,600,900,1200', loading: 'lazy', class: 'dx-ph dx-ph--img', alt: alt | default: '' }}
+  {%- else -%}
+    <img src="{{ 'dx-test-tee.webp' | asset_url }}" width="550" height="550" loading="lazy" class="dx-ph dx-ph--img" alt="{{ alt | default: '' | escape }}">
+  {%- endif -%}
+{%- else -%}
+  {{ name | default: 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+{%- endif -%}

@@ -34,7 +34,7 @@
           {{ alt | image_url: width: 1200 | image_tag: widths: '300,450,600,800,1000,1200', sizes: sizes, loading: 'lazy', class: 'dx-card__alt', alt: '' }}
         {%- endif -%}
       {%- else -%}
-        {{ 'product-apparel-1' | placeholder_svg_tag: 'dx-ph' }}
+        {%- render 'dx-ph', name: 'product-apparel-1', alt: product.title -%}
       {%- endif -%}
     </div>
     <h3 class="dx-card__title">{{ product.title }}</h3>
@@ -49,7 +49,8 @@
   {%- assign ph = index | default: 0 | modulo: 4 | plus: 1 -%}
   <div class="dx-card">
     <div class="dx-media dx-card__media">
-      {{ 'product-apparel-' | append: ph | placeholder_svg_tag: 'dx-ph' }}
+      {%- assign ph_name = 'product-apparel-' | append: ph -%}
+      {%- render 'dx-ph', name: ph_name -%}
     </div>
     <h3 class="dx-card__title">Product title</h3>
     <div class="dx-card__price"><span>{{ 0 | money }}</span></div>

@@ -2142,6 +2142,23 @@
         "label": "Google Fonts stylesheet URL",
         "default": "https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Krona+One&display=swap",
         "info": "Change together with the family names above."
+      },
+      {
+        "type": "header",
+        "content": "Test images"
+      },
+      {
+        "type": "checkbox",
+        "id": "dx_test_images",
+        "label": "Use test product image",
+        "info": "Products without photos show the test image. Turn off once real photos are uploaded.",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "dx_test_image",
+        "label": "Test image override",
+        "info": "Optional. Defaults to the bundled black tee."
       }
     ]
   }
