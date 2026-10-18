@@ -1,0 +1,161 @@
+{%- comment -%}
+  DUEXBROX FAQ page: grouped accordions (all closed on load, like the reference) + shared contact form.
+  Group blocks start a new heading; Question blocks belong to the group above them.
+  A group's anchor (e.g. "shipping") lets footer links jump straight to it: /pages/faq#shipping
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<div class="dx dx-faq">
+  <div class="dx-wrap">
+    {%- if s.breadcrumb -%}
+      <nav class="dx-crumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li aria-current="page">{{ page.title | default: 'FAQ' | escape }}</li>
+        </ol>
+      </nav>
+    {%- endif -%}
+    <h1 class="dx-sr">{{ page.title | default: 'FAQ' | escape }}</h1>
+
+    <div class="dx-faq__col">
+      {%- liquid
+        assign starts = ''
+        for block in section.blocks
+          if block.type == 'group' or forloop.first
+            assign starts = starts | append: forloop.index0 | append: ','
+          endif
+        endfor
+        assign starts = starts | split: ','
+      -%}
+      {%- for st in starts -%}
+        {%- liquid
+          assign from = st | plus: 0
+          assign next_i = forloop.index
+          assign to = section.blocks.size
+          if starts[next_i] != blank
+            assign to = starts[next_i] | plus: 0
+          endif
+          assign head = section.blocks[from]
+        -%}
+        <section class="dx-faq__grp" {% if head.type == 'group' and head.settings.anchor != blank %}id="{{ head.settings.anchor | handle }}"{% endif %} {% if head.type == 'group' %}{{ head.shopify_attributes }}{% endif %}>
+          {%- if head.type == 'group' -%}
+            <h2 class="dx-faq__h">{{ head.settings.title | escape }}</h2>
+          {%- endif -%}
+          <div class="dx-acc">
+            {%- for block in section.blocks -%}
+              {%- if forloop.index0 >= from and forloop.index0 < to and block.type == 'question' -%}
+                <details class="dx-acc__item" {% if block.settings.anchor != blank %}id="{{ block.settings.anchor | handle }}"{% endif %} {{ block.shopify_attributes }}>
+                  <summary class="dx-acc__q">
+                    <span>{{ block.settings.question | escape }}</span>
+                    <span class="dx-acc__icon" aria-hidden="true"></span>
+                  </summary>
+                  <div class="dx-acc__a"><div>{{ block.settings.answer }}</div></div>
+                </details>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endfor -%}
+    </div>
+
+    {%- if s.show_form -%}
+      <div class="dx-faq__form" id="support">
+        {%- assign fid = 'DxFaqContact-' | append: section.id -%}
+        {%- render 'dx-contact-form', id: fid, heading: s.form_heading, button: s.button -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (() => {
+    // Open the question or group targeted by the URL hash (e.g. /pages/faq#returns).
+    const openHash = () => {
+      if (!location.hash) return;
+      const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (!el) return;
+      const item = el.matches('details') ? el : el.querySelector('details');
+      if (item) item.open = true;
+    };
+    openHash();
+    window.addEventListener('hashchange', openHash);
+  })();
+</script>
+
+{% stylesheet %}
+  .dx-faq {
+    padding-bottom: clamp(56px, 6vw, 110px);
+  }
+
+  .dx-faq__col {
+    max-width: 1170px;
+    margin: 0 auto;
+  }
+
+  .dx-faq__grp {
+    padding-top: clamp(56px, 6vw, 110px);
+    scroll-margin-top: 40px;
+  }
+
+  .dx-faq__h {
+    text-align: center;
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(20px, 1.9vw, 34px);
+    text-transform: uppercase;
+    margin-bottom: clamp(28px, 3vw, 52px);
+  }
+
+  .dx-faq .dx-acc__q {
+    font-size: clamp(13px, 1vw, 18px);
+    padding-block: clamp(26px, 2.6vw, 44px);
+  }
+
+  .dx-faq .dx-acc__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .dx-faq .dx-acc__a > div {
+    font-size: clamp(14px, 1vw, 17px);
+  }
+
+  .dx-faq__form {
+    max-width: 1170px;
+    margin: clamp(64px, 7vw, 130px) auto 0;
+    scroll-margin-top: 40px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX FAQ",
+  "class": "dx-faq-section",
+  "max_blocks": 40,
+  "settings": [
+    { "type": "checkbox", "id": "breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "checkbox", "id": "show_form", "label": "Show contact form", "default": true },
+    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "Have Any Other Questions?" },
+    { "type": "text", "id": "button", "label": "Button label", "default": "Send message" }
+  ],
+  "blocks": [
+    {
+      "type": "group",
+      "name": "Group heading",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "ORDERS & SHIPPING" },
+        { "type": "text", "id": "anchor", "label": "Anchor id", "info": "e.g. shipping, returns, care" }
+      ]
+    },
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "Question" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Answer</p>" },
+        { "type": "text", "id": "anchor", "label": "Anchor id (optional)" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "DX FAQ" }]
+}
+{% endschema %}

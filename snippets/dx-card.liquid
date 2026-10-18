@@ -1,0 +1,58 @@
+{%- comment -%}
+  DUEXBROX product card: front image, back image on hover, title, live price.
+  @param {product} product - Shopify product (blank renders a placeholder card)
+  @param {string} [sizes] - responsive sizes attribute
+  @param {number} [index] - used for placeholder art and eager loading
+  @param {boolean} [lazy] - default true
+{%- endcomment -%}
+{%- liquid
+  assign sizes = sizes | default: '(min-width: 1200px) 22vw, (min-width: 900px) 30vw, (min-width: 540px) 45vw, 75vw'
+  assign loading = 'lazy'
+  if lazy == false
+    assign loading = 'eager'
+  endif
+-%}
+{%- if product != blank -%}
+  {%- liquid
+    assign main = product.featured_media.preview_image
+    assign alt = null
+    for m in product.media
+      if m.media_type == 'image' and m.id != product.featured_media.id
+        assign alt = m.preview_image
+        break
+      endif
+    endfor
+  -%}
+  <a href="{{ product.url }}" class="dx-card">
+    {%- unless product.available -%}
+      <span class="dx-card__badge">Sold out</span>
+    {%- endunless -%}
+    <div class="dx-media dx-card__media{% if alt %} has-alt{% endif %}">
+      {%- if main -%}
+        {{ main | image_url: width: 1200 | image_tag: widths: '300,450,600,800,1000,1200', sizes: sizes, loading: loading, class: 'dx-card__main', alt: main.alt | default: product.title }}
+        {%- if alt -%}
+          {{ alt | image_url: width: 1200 | image_tag: widths: '300,450,600,800,1000,1200', sizes: sizes, loading: 'lazy', class: 'dx-card__alt', alt: '' }}
+        {%- endif -%}
+      {%- else -%}
+        {%- render 'dx-ph', name: 'product-apparel-1', alt: product.title -%}
+      {%- endif -%}
+    </div>
+    <h3 class="dx-card__title">{{ product.title }}</h3>
+    <div class="dx-card__price">
+      <span>{{ product.price_min | money }}</span>
+      {%- if product.compare_at_price > product.price -%}
+        <s>{{ product.compare_at_price | money }}</s>
+      {%- endif -%}
+    </div>
+  </a>
+{%- else -%}
+  {%- assign ph = index | default: 0 | modulo: 4 | plus: 1 -%}
+  <div class="dx-card">
+    <div class="dx-media dx-card__media">
+      {%- assign ph_name = 'product-apparel-' | append: ph -%}
+      {%- render 'dx-ph', name: ph_name -%}
+    </div>
+    <h3 class="dx-card__title">Product title</h3>
+    <div class="dx-card__price"><span>{{ 0 | money }}</span></div>
+  </div>
+{%- endif -%}

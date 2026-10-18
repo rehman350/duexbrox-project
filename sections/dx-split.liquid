@@ -1,0 +1,194 @@
+{%- comment -%}
+  DUEXBROX split promo: two panels side by side (Featured piece + Premium packaging).
+  "Product" panels read title, price, link and image from the chosen product.
+{%- endcomment -%}
+<section class="dx dx-split" style="--dx-split-bg: {{ section.settings.bg }};">
+  <div class="dx-split__grid">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign b = block.settings
+        assign p = null
+        if block.type == 'product'
+          assign p = b.product
+        endif
+        assign title = b.title
+        assign url = b.link
+        assign img = b.image
+        if p
+          if title == blank
+            assign title = p.title
+          endif
+          if url == blank
+            assign url = p.url
+          endif
+          if img == blank
+            assign img = p.featured_media.preview_image
+          endif
+        endif
+      -%}
+      <article class="dx-split__panel dx-split__panel--img-{{ b.image_side }}" {{ block.shopify_attributes }}>
+        <div class="dx-split__text dx-rv">
+          {%- if b.label != blank -%}<p class="dx-label">{{ b.label | escape }}</p>{%- endif -%}
+          <h2 class="dx-split__h">{{ title | default: 'Featured product' | escape }}</h2>
+          {%- if p -%}
+            <p class="dx-split__price">{{ p.price | money }}</p>
+          {%- elsif block.type == 'product' -%}
+            <p class="dx-split__price">{{ 0 | money }}</p>
+          {%- endif -%}
+          {%- if b.text != blank -%}<div class="dx-split__p">{{ b.text }}</div>{%- endif -%}
+          {%- if b.cta != blank -%}
+            <a href="{{ url | default: routes.all_products_collection_url }}" class="dx-split__cta dx-ul dx-ul--on">{{ b.cta | escape }}</a>
+          {%- endif -%}
+        </div>
+        <div class="dx-split__media">
+          {%- if img != blank -%}
+            {{ img | image_url: width: 1400 | image_tag: widths: '400,600,800,1000,1400', sizes: '(min-width: 900px) 25vw, 50vw', loading: 'lazy', alt: img.alt | default: title }}
+          {%- else -%}
+            {%- render 'dx-ph', name: 'product-apparel-2', alt: title -%}
+          {%- endif -%}
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .dx-split__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    background: #fff;
+  }
+
+  .dx-split__panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    background: var(--dx-split-bg, #efefed);
+    min-height: clamp(300px, 22vw, 460px);
+    overflow: hidden;
+  }
+
+  .dx-split__panel--img-left .dx-split__media {
+    order: -1;
+  }
+
+  .dx-split__text {
+    padding: clamp(24px, 2.4vw, 48px);
+    display: grid;
+    gap: clamp(10px, 1vw, 16px);
+    align-content: center;
+  }
+
+  .dx-split__h {
+    margin-top: clamp(16px, 2vw, 32px);
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(14px, 1.1vw, 20px);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .dx-split__price {
+    font-size: 13px;
+  }
+
+  .dx-split__p {
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 34ch;
+  }
+
+  .dx-split__cta {
+    justify-self: start;
+    margin-top: clamp(12px, 1.4vw, 24px);
+    font-family: var(--dx-fh);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .dx-split__media {
+    position: relative;
+    height: 100%;
+    min-height: inherit;
+  }
+
+  .dx-split__media img,
+  .dx-split__media svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.1s var(--dx-ease-out);
+  }
+
+  .dx-split__panel:hover .dx-split__media img {
+    transform: scale(1.04);
+  }
+
+  @media (max-width: 1099px) {
+    .dx-split__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 539px) {
+    .dx-split__panel {
+      grid-template-columns: 1fr;
+    }
+
+    .dx-split__panel .dx-split__media {
+      order: -1;
+      aspect-ratio: 4 / 3;
+      min-height: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Split promo",
+  "class": "dx-split-section",
+  "max_blocks": 2,
+  "settings": [
+    { "type": "color", "id": "bg", "label": "Panel background", "default": "#efefed" }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Featured product",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "FEATURED PIECE" },
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "title", "label": "Title override", "info": "Defaults to the product title." },
+        { "type": "richtext", "id": "text", "label": "Text" },
+        { "type": "image_picker", "id": "image", "label": "Image override", "info": "Defaults to the product image. A lifestyle crop works best." },
+        { "type": "select", "id": "image_side", "label": "Image side", "options": [{ "value": "right", "label": "Right" }, { "value": "left", "label": "Left" }], "default": "right" },
+        { "type": "text", "id": "cta", "label": "Link label", "default": "VIEW PRODUCT" },
+        { "type": "url", "id": "link", "label": "Link override" }
+      ]
+    },
+    {
+      "type": "content",
+      "name": "Content panel",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "PACKAGED WITH PURPOSE" },
+        { "type": "text", "id": "title", "label": "Title", "default": "PREMIUM PACKAGING" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Every order is packed in our signature foil bag. Minimal outside. Built to protect what matters inside.</p>" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "select", "id": "image_side", "label": "Image side", "options": [{ "value": "right", "label": "Right" }, { "value": "left", "label": "Left" }], "default": "left" },
+        { "type": "text", "id": "cta", "label": "Link label", "default": "ORDER NOW" },
+        { "type": "url", "id": "link", "label": "Link", "default": "/collections/all" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "DX Split promo",
+      "blocks": [{ "type": "product" }, { "type": "content" }]
+    }
+  ]
+}
+{% endschema %}

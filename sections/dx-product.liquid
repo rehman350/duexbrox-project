@@ -1,0 +1,827 @@
+{%- comment -%}
+  DUEXBROX product page: stacked gallery, info column, native product form (variants, add to cart,
+  dynamic checkout), size chart dialog, review strip, product FAQ, sticky purchase bar.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign current = product.selected_or_first_available_variant
+  assign form_id = 'DxProductForm-' | append: section.id
+  assign faqs = section.blocks | where: 'type', 'faq'
+  assign reviews = section.blocks | where: 'type', 'review'
+  assign show_reviews = false
+  if reviews.size > 0
+    if s.reviews_verified or request.design_mode
+      assign show_reviews = true
+    endif
+  endif
+  assign size_chart = product.metafields.dx.size_chart
+  assign chart_html = ''
+  if size_chart != blank
+    assign chart_html = size_chart | metafield_tag
+  elsif s.size_chart_page != blank
+    assign chart_html = s.size_chart_page.content
+  elsif s.size_chart != blank
+    assign chart_html = s.size_chart
+  endif
+  assign single_variant = product.has_only_default_variant
+-%}
+
+<div
+  class="dx dx-pd"
+  data-dx-product
+  data-section="{{ section.id }}"
+  data-url="{{ product.url }}"
+>
+  <div class="dx-wrap">
+    <nav class="dx-crumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="{{ routes.root_url }}">Home</a></li>
+        <li aria-current="page">{{ product.title | escape }}</li>
+      </ol>
+    </nav>
+
+    <div class="dx-pd__grid">
+      <div class="dx-pd__gallery" data-dx-gallery>
+        {%- if product.media.size > 0 -%}
+          {%- for media in product.media -%}
+            <figure class="dx-pd__fig" data-media-id="{{ media.id }}">
+              {%- case media.media_type -%}
+                {%- when 'image' -%}
+                  {%- liquid
+                    assign loading = 'lazy'
+                    assign fp = 'auto'
+                    if forloop.first
+                      assign loading = 'eager'
+                      assign fp = 'high'
+                    endif
+                  -%}
+                  {{ media | image_url: width: 1800 | image_tag: widths: '400,600,800,1000,1300,1600,1800', sizes: '(min-width: 900px) 46vw, 100vw', loading: loading, fetchpriority: fp, alt: media.alt | default: product.title }}
+                {%- when 'video' -%}
+                  {{ media | video_tag: controls: true, playsinline: true, muted: true, image_size: '1200x' }}
+                {%- when 'external_video' -%}
+                  {{ media | external_video_tag }}
+                {%- else -%}
+                  {{ media | media_tag }}
+              {%- endcase -%}
+            </figure>
+          {%- endfor -%}
+        {%- else -%}
+          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-1', alt: product.title -%}</figure>
+          <figure class="dx-pd__fig">{%- render 'dx-ph', name: 'product-apparel-2' -%}</figure>
+        {%- endif -%}
+      </div>
+
+      <div class="dx-pd__info">
+        <div class="dx-pd__sticky">
+          {%- if s.brand != blank -%}
+            <p class="dx-pd__brand">{{ s.brand | escape }}</p>
+          {%- endif -%}
+          <div class="dx-pd__titlerow">
+            <h1 class="dx-pd__title">{{ product.title | escape }}</h1>
+            <button type="button" class="dx-pd__share" data-dx-share data-url="{{ shop.url }}{{ product.url }}" data-title="{{ product.title | escape }}" data-copied="Link copied" aria-label="Share">
+              {%- render 'dx-icon', name: 'share' -%}
+            </button>
+          </div>
+
+          {%- if show_reviews -%}
+            <div class="dx-pd__rev" aria-label="Customer reviews">
+              {%- unless s.reviews_verified -%}
+                <p class="dx-pd__revnote">Theme editor only: these sample reviews stay hidden on the live store until "Reviews are real" is ticked.</p>
+              {%- endunless -%}
+              <div class="dx-mq dx-pd__mq" style="--dx-mq-speed: {{ s.review_speed }}s; --dx-mq-gap: 0px; --dx-mq-pause: paused;">
+                {%- for r in (1..2) -%}
+                  <ul class="dx-mq__row" role="list" {% if forloop.last %}aria-hidden="true"{% endif %}>
+                    {%- for block in reviews -%}
+                      <li class="dx-pd__review" {% if forloop.parentloop.first %}{{ block.shopify_attributes }}{% endif %}>
+                        <span class="dx-pd__stars" aria-label="{{ block.settings.rating }} out of 5 stars">
+                          {%- for i in (1..5) -%}
+                            <span class="{% if i > block.settings.rating %}is-off{% endif %}">{%- render 'dx-icon', name: 'star' -%}</span>
+                          {%- endfor -%}
+                        </span>
+                        <span class="dx-pd__rname">{{ block.settings.name | escape }}</span>
+                        <span class="dx-pd__rtext">&ldquo;{{ block.settings.text | escape }}&rdquo;</span>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="dx-pd__price" data-dx-price>
+            <span data-dx-price-now>{{ current.price | money }}</span>
+            <s data-dx-price-was {% unless current.compare_at_price > current.price %}hidden{% endunless %}>{{ current.compare_at_price | money }}</s>
+          </div>
+          {%- if s.tax_text != blank -%}
+            <div class="dx-pd__tax">
+              {%- liquid
+                assign ship_url = shop.shipping_policy.url | default: s.shipping_link
+                assign ship_link = '<a href="' | append: ship_url | append: '">Shipping</a>'
+              -%}
+              {{ s.tax_text | escape | replace: '[Shipping]', ship_link }}
+            </div>
+          {%- endif -%}
+
+          {%- form 'product', product, id: form_id, class: 'dx-pd__form', novalidate: 'novalidate', data-dx-form: 'true' -%}
+            <input type="hidden" name="id" value="{{ current.id }}" data-dx-variant-id>
+
+            {%- unless single_variant -%}
+              {%- for option in product.options_with_values -%}
+                <fieldset class="dx-pd__opt" data-dx-option="{{ forloop.index0 }}">
+                  <legend>
+                    <span class="dx-pd__optname">{{ option.name | escape }}</span>
+                    <span class="dx-pd__optval" data-dx-option-value>{{ option.selected_value | escape }}</span>
+                  </legend>
+                  <div class="dx-pd__vals">
+                    {%- for value in option.values -%}
+                      {%- liquid
+                        assign vid = form_id | append: '-' | append: forloop.parentloop.index0 | append: '-' | append: forloop.index0
+                        assign avail = true
+                        if value.available == false
+                          assign avail = false
+                        endif
+                      -%}
+                      <input
+                        type="radio"
+                        class="dx-sr"
+                        id="{{ vid }}"
+                        name="dx-option-{{ section.id }}-{{ forloop.parentloop.index0 }}"
+                        value="{{ value | escape }}"
+                        {% if value.selected %}checked{% endif %}
+                      >
+                      <label for="{{ vid }}" class="dx-pd__val{% unless avail %} is-na{% endunless %}">{{ value | escape }}</label>
+                    {%- endfor -%}
+                  </div>
+                </fieldset>
+              {%- endfor -%}
+            {%- endunless -%}
+
+            <p class="dx-pd__stock {% if current.available %}is-in{% else %}is-out{% endif %}" data-dx-stock role="status">
+              {%- if current.available -%}
+                {%- if current.inventory_management == 'shopify' and current.inventory_quantity > 0 and current.inventory_quantity <= s.low_stock -%}
+                  Only {{ current.inventory_quantity }} left
+                {%- else -%}
+                  In stock
+                {%- endif -%}
+              {%- else -%}
+                Sold out
+              {%- endif -%}
+            </p>
+
+            {%- if chart_html != blank -%}
+              <button type="button" class="dx-pd__chartbtn" data-dx-chart-open aria-haspopup="dialog">
+                <span class="dx-ul dx-ul--on">Size Chart</span>
+                {%- render 'dx-icon', name: 'ruler' -%}
+              </button>
+            {%- endif -%}
+
+            <div class="dx-pd__buy">
+              <button
+                type="submit"
+                name="add"
+                class="dx-btn dx-btn--line dx-btn--block dx-pd__add"
+                data-dx-add
+                {% unless current.available %}disabled{% endunless %}
+              >
+                <span data-dx-add-label>{% if current.available %}Add to cart{% else %}Sold out{% endif %}</span>
+              </button>
+              {%- if s.show_dynamic_checkout -%}
+                <div class="dx-pd__dyn" data-dx-dyn {% unless current.available %}hidden{% endunless %}>
+                  {{ form | payment_button }}
+                </div>
+              {%- endif -%}
+              <p class="dx-pd__err dx-msg dx-msg--err" data-dx-error role="alert" hidden></p>
+            </div>
+          {%- endform -%}
+
+          <div class="dx-pd__desc">
+            {%- if product.description != blank -%}
+              <h2 class="dx-pd__subh">Description</h2>
+              <div class="dx-rte">{{ product.description }}</div>
+            {%- endif -%}
+            {%- if product.metafields.dx.details != blank -%}
+              <h2 class="dx-pd__subh">Details:</h2>
+              <div class="dx-rte">{{ product.metafields.dx.details | metafield_tag }}</div>
+            {%- endif -%}
+            {%- if product.metafields.dx.color != blank or product.metafields.dx.material != blank -%}
+              <div class="dx-rte dx-pd__facts">
+                {%- if product.metafields.dx.color != blank -%}<p><strong>Color:</strong> {{ product.metafields.dx.color.value | escape }}</p>{%- endif -%}
+                {%- if product.metafields.dx.material != blank -%}<p><strong>Material:</strong> {{ product.metafields.dx.material.value | escape }}</p>{%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- if s.packaging != blank -%}
+              <div class="dx-rte dx-pd__pack">{{ s.packaging }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {%- if faqs.size > 0 -%}
+      <div class="dx-pd__faq dx-acc">
+        {%- for block in faqs -%}
+          <details class="dx-acc__item" {% if forloop.first and s.first_faq_open %}open{% endif %} {{ block.shopify_attributes }}>
+            <summary class="dx-acc__q">
+              <span>{{ block.settings.question | escape }}</span>
+              <span class="dx-acc__icon" aria-hidden="true"></span>
+            </summary>
+            <div class="dx-acc__a"><div>{{ block.settings.answer }}</div></div>
+          </details>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if chart_html != blank -%}
+    <dialog class="dx-dlg" data-dx-chart aria-labelledby="DxChartH-{{ section.id }}">
+      <div class="dx-dlg__in">
+        <div class="dx-dlg__head">
+          <h2 class="dx-dlg__h" id="DxChartH-{{ section.id }}">Size Chart</h2>
+          <button type="button" class="dx-dlg__x" data-dx-chart-close aria-label="Close size chart">
+            {%- render 'dx-icon', name: 'close' -%}
+          </button>
+        </div>
+        <div class="dx-rte dx-dlg__body">{{ chart_html }}</div>
+      </div>
+    </dialog>
+  {%- endif -%}
+
+  {%- if s.sticky_bar -%}
+    <div class="dx-sticky" data-dx-sticky aria-hidden="true">
+      <div class="dx-sticky__img">
+        {%- assign thumb = current.featured_media.preview_image | default: product.featured_media.preview_image -%}
+        {%- if thumb -%}
+          {{ thumb | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', data-dx-sticky-img: '' }}
+        {%- endif -%}
+      </div>
+      <div class="dx-sticky__txt">
+        <p class="dx-sticky__t">{{ product.title | escape }}</p>
+        <p class="dx-sticky__p" data-dx-sticky-price>{{ current.price | money }}</p>
+        {%- unless single_variant -%}<p class="dx-sticky__v" data-dx-sticky-variant>{{ current.title | escape }}</p>{%- endunless -%}
+      </div>
+      <button type="submit" form="{{ form_id }}" name="add" class="dx-btn dx-sticky__btn" data-dx-sticky-add tabindex="-1" {% unless current.available %}disabled{% endunless %}>
+        {% if current.available %}Add{% else %}Sold out{% endif %}
+      </button>
+    </div>
+  {%- endif -%}
+
+  <script type="application/json" data-dx-product-json>
+    {
+      "variants": {{ product.variants | json }},
+      "moneyFormat": {{ shop.money_format | json }},
+      "cartUrl": {{ routes.cart_url | json }},
+      "lowStock": {{ s.low_stock | json }}
+    }
+  </script>
+</div>
+
+<script src="{{ 'dx-product.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .dx-pd {
+    padding-bottom: clamp(48px, 5vw, 96px);
+  }
+
+  .dx-pd__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 80px);
+    margin-top: clamp(16px, 2vw, 28px);
+    align-items: start;
+  }
+
+  .dx-pd__gallery {
+    display: grid;
+    gap: clamp(12px, 2vw, 40px);
+  }
+
+  .dx-pd__fig {
+    margin: 0;
+    background: #fff;
+  }
+
+  .dx-pd__fig img,
+  .dx-pd__fig svg,
+  .dx-pd__fig video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .dx-pd__fig svg {
+    aspect-ratio: 1;
+  }
+
+  .dx-pd__sticky {
+    position: sticky;
+    top: calc(var(--dx-hd-h, 76px) + 16px);
+    padding-top: 12px;
+  }
+
+  .dx-pd__brand {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--dx-muted);
+    text-transform: uppercase;
+  }
+
+  .dx-pd__titlerow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: clamp(12px, 1.4vw, 22px);
+  }
+
+  .dx-pd__title {
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(20px, 1.8vw, 32px);
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .dx-pd__share {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--dx-line);
+    background: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dx-pd__share:hover {
+    background: var(--dx-black);
+    color: #fff;
+  }
+
+  .dx-pd__share svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .dx-pd__rev {
+    margin-top: clamp(16px, 1.6vw, 24px);
+  }
+
+  .dx-pd__revnote {
+    font-size: 11px;
+    color: #9a6700;
+    margin-bottom: 6px;
+  }
+
+  .dx-pd__mq {
+    background: #f1f1ef;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+    mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  }
+
+  .dx-pd__mq .dx-mq__row {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    justify-content: flex-start;
+  }
+
+  .dx-pd__review {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-right: 1px solid #dcdcd9;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .dx-pd__stars {
+    display: inline-flex;
+    gap: 1px;
+  }
+
+  .dx-pd__stars svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .dx-pd__stars .is-off {
+    opacity: 0.25;
+  }
+
+  .dx-pd__rname {
+    font-family: var(--dx-fh);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .dx-pd__rtext {
+    font-style: italic;
+  }
+
+  .dx-pd__price {
+    margin-top: clamp(20px, 2vw, 32px);
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-family: var(--dx-fh);
+    font-size: clamp(15px, 1.05vw, 19px);
+  }
+
+  .dx-pd__price s {
+    font-family: var(--dx-fb);
+    font-size: 0.85em;
+    color: var(--dx-muted);
+  }
+
+  .dx-pd__tax {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--dx-muted);
+  }
+
+  .dx-pd__tax a {
+    text-decoration: underline;
+    color: var(--dx-black);
+  }
+
+  .dx-pd__form {
+    margin-top: clamp(20px, 2.4vw, 36px);
+  }
+
+  .dx-pd__opt {
+    border: 0;
+    padding: 0;
+    margin: 0 0 20px;
+    min-width: 0;
+  }
+
+  .dx-pd__opt legend {
+    padding: 0;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+    font-family: var(--dx-fh);
+    font-size: 13px;
+  }
+
+  .dx-pd__optval {
+    font-family: var(--dx-fb);
+    color: var(--dx-muted);
+  }
+
+  .dx-pd__vals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .dx-pd__val {
+    min-width: 66px;
+    height: 46px;
+    padding: 0 18px;
+    border: 1px solid var(--dx-line);
+    border-radius: 999px;
+    display: inline-grid;
+    place-items: center;
+    font-size: 13px;
+    cursor: pointer;
+    background: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+
+  .dx-pd__val:hover {
+    border-color: var(--dx-black);
+  }
+
+  input:checked + .dx-pd__val {
+    background: var(--dx-black);
+    color: #fff;
+    border-color: var(--dx-black);
+  }
+
+  input:focus-visible + .dx-pd__val {
+    outline: 2px solid var(--dx-black);
+    outline-offset: 2px;
+  }
+
+  .dx-pd__val.is-na {
+    color: #a3a3a3;
+    text-decoration: line-through;
+    background: #f6f6f5;
+  }
+
+  input:checked + .dx-pd__val.is-na {
+    background: #6f6f6f;
+    border-color: #6f6f6f;
+    color: #fff;
+  }
+
+  .dx-pd__stock {
+    font-family: var(--dx-fh);
+    font-size: 12px;
+    margin: 6px 0 22px;
+  }
+
+  .dx-pd__stock.is-in {
+    color: var(--dx-ok);
+  }
+
+  .dx-pd__stock.is-out {
+    color: var(--dx-muted);
+  }
+
+  .dx-pd__chartbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: clamp(18px, 2vw, 28px);
+  }
+
+  .dx-pd__chartbtn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dx-pd__buy {
+    display: grid;
+    gap: 14px;
+  }
+
+  .dx-pd__buy .dx-btn {
+    min-height: 54px;
+    font-size: 14px;
+  }
+
+  .dx-pd__dyn .shopify-payment-button__button {
+    width: 100%;
+    min-height: 54px;
+    border-radius: 999px !important;
+    overflow: hidden;
+  }
+
+  .dx-pd__dyn .shopify-payment-button__button--unbranded {
+    background: var(--dx-black) !important;
+    color: #fff !important;
+    border: 1px solid var(--dx-black) !important;
+    font-family: var(--dx-fb) !important;
+    font-size: 14px !important;
+    text-transform: none !important;
+    transition: background-color var(--dx-t) var(--dx-ease), color var(--dx-t) var(--dx-ease);
+  }
+
+  .dx-pd__dyn .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+    background: #fff !important;
+    color: var(--dx-black) !important;
+  }
+
+  .dx-pd__dyn .shopify-payment-button__more-options {
+    font-size: 12px;
+    text-decoration: underline;
+    margin-top: 8px;
+  }
+
+  .dx-pd__desc {
+    margin-top: clamp(28px, 3vw, 44px);
+    display: grid;
+    gap: 14px;
+  }
+
+  .dx-pd__subh {
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  .dx-pd__desc .dx-rte {
+    font-size: 14px;
+  }
+
+  .dx-pd__faq {
+    max-width: 920px;
+    margin: clamp(64px, 7vw, 120px) auto 0;
+  }
+
+  /* Size chart dialog */
+  .dx-dlg {
+    width: min(720px, calc(100vw - 32px));
+    max-height: min(85vh, 900px);
+    padding: 0;
+    border: 0;
+    color: var(--dx-black);
+  }
+
+  .dx-dlg::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  .dx-dlg[open] {
+    animation: dx-dlg-in 0.4s var(--dx-ease);
+  }
+
+  @keyframes dx-dlg-in {
+    from { opacity: 0; transform: translateY(16px); }
+  }
+
+  .dx-dlg__in {
+    padding: clamp(20px, 3vw, 36px);
+  }
+
+  .dx-dlg__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .dx-dlg__h {
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+
+  .dx-dlg__x {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .dx-dlg__x svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .dx-dlg__body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .dx-dlg__body th,
+  .dx-dlg__body td {
+    border-bottom: 1px solid var(--dx-line);
+    padding: 10px 8px;
+    text-align: left;
+  }
+
+  /* Sticky purchase bar */
+  .dx-sticky {
+    position: fixed;
+    z-index: 40;
+    right: clamp(12px, 1.5vw, 24px);
+    bottom: clamp(12px, 1.5vw, 24px);
+    width: min(400px, calc(100vw - 24px));
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    transform: translateY(calc(100% + 40px));
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.5s var(--dx-ease), opacity 0.5s var(--dx-ease), visibility 0s linear 0.5s;
+  }
+
+  .dx-sticky.is-on {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.5s var(--dx-ease), opacity 0.5s var(--dx-ease), visibility 0s;
+  }
+
+  .dx-sticky__img img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+  }
+
+  .dx-sticky__t {
+    font-family: var(--dx-fh);
+    font-size: 11px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dx-sticky__p,
+  .dx-sticky__v {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .dx-sticky__v {
+    color: var(--dx-muted);
+    text-decoration: underline;
+  }
+
+  .dx-sticky__btn {
+    min-height: 40px;
+    padding: 8px 22px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 899px) {
+    .dx-pd__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dx-pd__gallery {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 8px;
+      margin-inline: calc(var(--dx-gutter) * -1);
+      padding-inline: var(--dx-gutter);
+      scrollbar-width: none;
+    }
+
+    .dx-pd__gallery::-webkit-scrollbar {
+      display: none;
+    }
+
+    .dx-pd__fig {
+      flex: 0 0 88%;
+      scroll-snap-align: center;
+    }
+
+    .dx-pd__fig:only-child {
+      flex-basis: 100%;
+    }
+
+    .dx-pd__sticky {
+      position: static;
+    }
+
+    .dx-sticky {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      border-radius: 0;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Product",
+  "class": "dx-pd-section",
+  "settings": [
+    { "type": "text", "id": "brand", "label": "Brand label", "default": "DUEXBROX" },
+    { "type": "text", "id": "tax_text", "label": "Tax and shipping note", "default": "Tax included. [Shipping] calculated at checkout.", "info": "[Shipping] becomes a link to the Shipping policy." },
+    { "type": "url", "id": "shipping_link", "label": "Shipping link fallback", "default": "/collections/all", "info": "Used when no Shipping policy exists yet." },
+    { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show Buy it now", "default": true },
+    { "type": "range", "id": "low_stock", "label": "Show 'Only X left' at or below", "min": 0, "max": 10, "step": 1, "default": 3 },
+    { "type": "header", "content": "Size chart" },
+    { "type": "page", "id": "size_chart_page", "label": "Size chart page", "info": "Used when the product has no dx.size_chart metafield." },
+    { "type": "richtext", "id": "size_chart", "label": "Size chart text fallback" },
+    { "type": "header", "content": "Packaging" },
+    { "type": "richtext", "id": "packaging", "label": "Packaging note", "default": "<p>Every order arrives in our custom <strong>DUEXBROX packaging</strong>, designed to protect your pieces from delivery to wardrobe.</p>" },
+    { "type": "header", "content": "Reviews strip" },
+    { "type": "checkbox", "id": "reviews_verified", "label": "Reviews are real customer reviews", "default": false, "info": "Leave unticked while using sample text. The strip only shows on the live store when ticked." },
+    { "type": "range", "id": "review_speed", "label": "Strip speed (seconds per loop)", "min": 10, "max": 80, "step": 5, "default": 35 },
+    { "type": "header", "content": "Extras" },
+    { "type": "checkbox", "id": "first_faq_open", "label": "Open the first FAQ on load", "default": true },
+    { "type": "checkbox", "id": "sticky_bar", "label": "Show sticky add bar", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Reviewer", "default": "SAMPLE REVIEW" },
+        { "type": "text", "id": "text", "label": "Quote", "default": "Replace with a real customer review." },
+        { "type": "range", "id": "rating", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How do DUEXBROX pieces fit?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Answer</p>" }
+      ]
+    }
+  ]
+}
+{% endschema %}

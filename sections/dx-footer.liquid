@@ -1,0 +1,346 @@
+{%- comment -%}
+  DUEXBROX footer: newsletter (Shopify customer form), link columns, social/contact, legal row.
+  Each column uses a Shopify menu when one is picked, otherwise its own link fields.
+{%- endcomment -%}
+{%- liquid
+  assign cols = section.blocks | where: 'type', 'column'
+  assign year = 'now' | date: '%Y'
+-%}
+<div class="dx dx-ft" style="--dx-ft-bg: {{ section.settings.bg }};">
+  <div class="dx-wrap">
+    <div class="dx-ft__top">
+      <div class="dx-ft__news">
+        <h2 class="dx-ft__title">{{ section.settings.news_title | escape }}</h2>
+        {%- if section.settings.news_text != blank -%}
+          <p class="dx-ft__text">{{ section.settings.news_text | escape }}</p>
+        {%- endif -%}
+        {%- form 'customer', id: 'DxNewsletter', class: 'dx-ft__form', novalidate: 'novalidate', data-dx-validate: 'true' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter, duexbrox">
+          {%- if form.posted_successfully? -%}
+            <p class="dx-ft__ok" role="status" tabindex="-1" autofocus>{{ section.settings.news_ok | escape }}</p>
+          {%- endif -%}
+          <div class="dx-fld dx-ft__fld{% if form.errors %} is-invalid{% endif %}">
+            <label for="DxNewsEmail" class="dx-sr">Email</label>
+            <div class="dx-fld__box dx-ft__box">
+              <input
+                id="DxNewsEmail"
+                type="email"
+                name="contact[email]"
+                required
+                autocomplete="email"
+                placeholder="{{ section.settings.news_placeholder | escape }}"
+                value="{{ form.email }}"
+                aria-describedby="DxNewsErr"
+              >
+              <button type="submit" class="dx-ft__go" aria-label="Subscribe">
+                {%- render 'dx-icon', name: 'arrow' -%}
+              </button>
+            </div>
+            <p
+              class="dx-fld__err"
+              id="DxNewsErr"
+              data-required="Please enter your email."
+              data-invalid="Please enter a valid email address."
+            >
+              {%- if form.errors -%}
+                {%- if form.errors.messages['email'] contains 'taken' -%}
+                  This email is already subscribed.
+                {%- else -%}
+                  {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+                {%- endif -%}
+              {%- endif -%}
+            </p>
+          </div>
+        {%- endform -%}
+      </div>
+
+      <div class="dx-ft__cols">
+        {%- for block in cols -%}
+          {%- assign menu = block.settings.menu -%}
+          <div class="dx-ft__col" {{ block.shopify_attributes }}>
+            <h3 class="dx-ft__h">{{ block.settings.heading | escape }}</h3>
+            <ul>
+              {%- if menu != blank and menu.links.size > 0 -%}
+                {%- for link in menu.links -%}
+                  <li><a href="{{ link.url }}" class="dx-ul">{{ link.title | escape }}</a></li>
+                {%- endfor -%}
+              {%- else -%}
+                {%- for i in (1..5) -%}
+                  {%- assign lk = 'label_' | append: i -%}
+                  {%- assign uk = 'url_' | append: i -%}
+                  {%- if block.settings[lk] != blank -%}
+                    <li><a href="{{ block.settings[uk] | default: '#' }}" class="dx-ul">{{ block.settings[lk] | escape }}</a></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+            </ul>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <ul class="dx-ft__social">
+        {%- if section.settings.tiktok != blank -%}
+          <li><a href="{{ section.settings.tiktok }}" class="dx-ul" target="_blank" rel="noopener">TIKTOK</a></li>
+        {%- else -%}
+          <li><span>TIKTOK</span></li>
+        {%- endif -%}
+        {%- if section.settings.instagram != blank -%}
+          <li><a href="{{ section.settings.instagram }}" class="dx-ul" target="_blank" rel="noopener">INSTAGRAM</a></li>
+        {%- else -%}
+          <li><span>INSTAGRAM</span></li>
+        {%- endif -%}
+        {%- if section.settings.email != blank -%}
+          <li><a href="mailto:{{ section.settings.email | downcase }}" class="dx-ul dx-ft__mail">{{ section.settings.email | upcase }}</a></li>
+        {%- endif -%}
+      </ul>
+    </div>
+
+    <div class="dx-ft__bottom">
+      <p>© {{ year }} {{ section.settings.copyright | escape }}</p>
+      <ul>
+        {%- liquid
+          assign privacy = section.settings.privacy_url
+          if privacy == blank and shop.privacy_policy
+            assign privacy = shop.privacy_policy.url
+          endif
+          assign terms = section.settings.terms_url
+          if terms == blank and shop.terms_of_service
+            assign terms = shop.terms_of_service.url
+          endif
+        -%}
+        <li><a href="{{ privacy | default: '/policies/privacy-policy' }}" class="dx-ul">Privacy Policy</a></li>
+        <li><a href="{{ terms | default: '/policies/terms-of-service' }}" class="dx-ul">Terms &amp; Conditions</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .dx-ft {
+    background: var(--dx-ft-bg, #f4f4f2);
+    padding-block: clamp(48px, 5vw, 84px) 28px;
+    font-size: 14px;
+  }
+
+  .dx-ft__top {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.15fr) minmax(0, 2fr) minmax(180px, 0.8fr);
+    gap: clamp(32px, 5vw, 96px);
+    padding-bottom: clamp(40px, 4.5vw, 72px);
+  }
+
+  .dx-ft__title,
+  .dx-ft__h {
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(13px, 0.95vw, 17px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .dx-ft__h {
+    font-size: clamp(11px, 0.8vw, 14px);
+    margin-bottom: clamp(18px, 1.8vw, 28px);
+  }
+
+  .dx-ft__text {
+    margin-top: 12px;
+    max-width: 420px;
+    line-height: 1.55;
+    color: #2b2b2b;
+  }
+
+  .dx-ft__form {
+    margin-top: clamp(24px, 2.4vw, 36px);
+    max-width: 440px;
+  }
+
+  .dx-ft__box {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--dx-black);
+  }
+
+  .dx-ft__box::after {
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .dx-ft__box input {
+    border: 0;
+    background: transparent;
+    min-height: 48px;
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  .dx-ft__go {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.4s var(--dx-ease);
+  }
+
+  .dx-ft__go:hover {
+    transform: translateX(4px);
+  }
+
+  .dx-ft__go svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dx-ft__ok {
+    margin-bottom: 12px;
+    color: var(--dx-ok);
+    font-size: 14px;
+  }
+
+  .dx-ft__cols {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, max-content));
+    justify-content: center;
+    gap: clamp(24px, 4vw, 72px);
+  }
+
+  .dx-ft__col ul,
+  .dx-ft__social,
+  .dx-ft__bottom ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dx-ft__col li + li {
+    margin-top: clamp(12px, 1.2vw, 20px);
+  }
+
+  .dx-ft__col a {
+    color: #2b2b2b;
+  }
+
+  .dx-ft__social {
+    display: grid;
+    align-content: start;
+    gap: clamp(14px, 1.4vw, 22px);
+    justify-items: end;
+    text-align: right;
+    letter-spacing: 0.06em;
+  }
+
+  .dx-ft__mail {
+    word-break: break-all;
+  }
+
+  .dx-ft__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding-top: 28px;
+    border-top: 1px solid var(--dx-line);
+    font-size: 12px;
+    color: #3a3a3a;
+    text-transform: none;
+  }
+
+  .dx-ft__bottom p {
+    text-transform: uppercase;
+  }
+
+  .dx-ft__bottom ul {
+    display: flex;
+    gap: 24px;
+  }
+
+  @media (max-width: 1099px) {
+    .dx-ft__top {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .dx-ft__cols {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: start;
+    }
+
+    .dx-ft__social {
+      justify-items: end;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .dx-ft__top {
+      grid-template-columns: 1fr;
+    }
+
+    .dx-ft__cols {
+      grid-row: auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 36px 24px;
+    }
+
+    .dx-ft__social {
+      justify-items: start;
+      text-align: left;
+    }
+
+    .dx-ft__bottom {
+      flex-direction: column;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Footer",
+  "class": "dx-footer-section",
+  "enabled_on": { "groups": ["footer"] },
+  "max_blocks": 6,
+  "settings": [
+    { "type": "color", "id": "bg", "label": "Background", "default": "#f4f4f2" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "text", "id": "news_title", "label": "Heading", "default": "JOIN THE BROX." },
+    { "type": "text", "id": "news_text", "label": "Text", "default": "Be the first to know about new collections and limited releases." },
+    { "type": "text", "id": "news_placeholder", "label": "Placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "news_ok", "label": "Success message", "default": "Thanks for joining the Brox. You're on the list." },
+    { "type": "header", "content": "Social and contact" },
+    { "type": "url", "id": "tiktok", "label": "TikTok URL", "info": "Add your official profile link. Leave empty to show the label without a link." },
+    { "type": "url", "id": "instagram", "label": "Instagram URL" },
+    { "type": "text", "id": "email", "label": "Contact email", "default": "hello.duexbrox@gmail.com" },
+    { "type": "header", "content": "Bottom row" },
+    { "type": "text", "id": "copyright", "label": "Copyright text (year is automatic)", "default": "DUEXBROX. ALL RIGHTS RESERVED." },
+    { "type": "url", "id": "privacy_url", "label": "Privacy Policy link", "info": "Defaults to Shopify's Privacy Policy page." },
+    { "type": "url", "id": "terms_url", "label": "Terms link", "info": "Defaults to Shopify's Terms of Service page." }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "SHOP" },
+        { "type": "link_list", "id": "menu", "label": "Menu (optional)", "info": "When chosen, the menu replaces the links below." },
+        { "type": "text", "id": "label_1", "label": "Link 1 label" },
+        { "type": "url", "id": "url_1", "label": "Link 1" },
+        { "type": "text", "id": "label_2", "label": "Link 2 label" },
+        { "type": "url", "id": "url_2", "label": "Link 2" },
+        { "type": "text", "id": "label_3", "label": "Link 3 label" },
+        { "type": "url", "id": "url_3", "label": "Link 3" },
+        { "type": "text", "id": "label_4", "label": "Link 4 label" },
+        { "type": "url", "id": "url_4", "label": "Link 4" },
+        { "type": "text", "id": "label_5", "label": "Link 5 label" },
+        { "type": "url", "id": "url_5", "label": "Link 5" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "DX Footer" }]
+}
+{% endschema %}

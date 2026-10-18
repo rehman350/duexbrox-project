@@ -1,0 +1,57 @@
+{%- comment -%} DUEXBROX generic page: centred title + readable rich text column (Shipping, Returns, custom pages). {%- endcomment -%}
+{%- assign s = section.settings -%}
+<div class="dx dx-pg">
+  <div class="dx-wrap">
+    {%- if s.breadcrumb -%}
+      <nav class="dx-crumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li aria-current="page">{{ page.title | escape }}</li>
+        </ol>
+      </nav>
+    {%- endif -%}
+    <article class="dx-pg__in">
+      <h1 class="dx-pg__h">{{ page.title | escape }}</h1>
+      <div class="dx-rte dx-pg__body">{{ page.content }}</div>
+    </article>
+  </div>
+</div>
+
+{% stylesheet %}
+  .dx-pg__in {
+    max-width: 820px;
+    margin: 0 auto;
+    padding-block: clamp(48px, 6vw, 100px) clamp(56px, 7vw, 120px);
+  }
+
+  .dx-pg__h {
+    text-align: center;
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(22px, 2.2vw, 34px);
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .dx-pg__body {
+    color: #2a2a2a;
+    line-height: 1.75;
+  }
+
+  .dx-pg__body :is(h2, h3, h4) {
+    font-family: var(--dx-fb);
+    font-weight: 600;
+    font-size: 18px;
+    margin-top: 2em;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Page content",
+  "class": "dx-pg-section",
+  "settings": [
+    { "type": "checkbox", "id": "breadcrumb", "label": "Show breadcrumb", "default": false }
+  ],
+  "enabled_on": { "templates": ["page"] }
+}
+{% endschema %}

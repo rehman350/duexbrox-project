@@ -1,0 +1,50 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "dx-banner",
+      "settings": {
+        "ratio": "2 / 1",
+        "position": "right center",
+        "loading": "eager",
+        "anchor": ""
+      }
+    },
+    "marquee": {
+      "type": "dx-marquee",
+      "settings": {
+        "text": "PRESENCE OVER NOISE",
+        "repeat": 4,
+        "speed": 22,
+        "gap": 120,
+        "bg": "#111111",
+        "fg": "#ffffff"
+      }
+    },
+    "story": {
+      "type": "dx-about",
+      "settings": {
+        "statement": "DUEXBROX is a contemporary streetwear label built around individuality, attitude and self-expression.",
+        "text": "<p>Our approach is simple: strong silhouettes, considered details and everyday pieces that make an impact without trying too hard. From oversized tees and structured outerwear to relaxed cargos, every DUEXBROX piece is designed to be worn as part of a uniform, pieces that work together, but still carry their own identity.</p>",
+        "quote": "WE DON'T DESIGN TO FIT IN",
+        "signature": "DUEXBROX. WEAR IT YOUR WAY.",
+        "cta_text": "Ready to wear it your way?",
+        "cta_label": "SHOP THE UNIFORMS",
+        "cta_link": "/pages/uniforms"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "story"
+  ]
+}

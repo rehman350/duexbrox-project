@@ -1,0 +1,170 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "dx-faq",
+      "blocks": {
+        "group_1": {
+          "type": "group",
+          "settings": {
+            "title": "ORDERS & SHIPPING",
+            "anchor": "shipping"
+          }
+        },
+        "question_2": {
+          "type": "question",
+          "settings": {
+            "question": "Where does DUEXBROX ship?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> We currently ship to the countries enabled at checkout. Enter your address at checkout to see if delivery is available.</p>",
+            "anchor": ""
+          }
+        },
+        "question_3": {
+          "type": "question",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Orders are usually dispatched within [X] business days. Delivery times depend on your location and courier.</p>",
+            "anchor": ""
+          }
+        },
+        "question_4": {
+          "type": "question",
+          "settings": {
+            "question": "How much is shipping?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Shipping costs are calculated at checkout based on your address. Any free-shipping offer is shown in the announcement bar.</p>",
+            "anchor": ""
+          }
+        },
+        "question_5": {
+          "type": "question",
+          "settings": {
+            "question": "Will I receive tracking information?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Yes. Once your order ships you will receive an email with your tracking details.</p>",
+            "anchor": ""
+          }
+        },
+        "question_6": {
+          "type": "question",
+          "settings": {
+            "question": "Can I change or cancel my order?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Contact us as soon as possible at hello.duexbrox@gmail.com. We can only change or cancel orders that have not shipped yet.</p>",
+            "anchor": ""
+          }
+        },
+        "question_7": {
+          "type": "question",
+          "settings": {
+            "question": "What if I receive an incorrect or damaged item?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Email us within [X] days of delivery with your order number and photos, and we will arrange a replacement or refund.</p>",
+            "anchor": ""
+          }
+        },
+        "group_8": {
+          "type": "group",
+          "settings": {
+            "title": "RETURNS & FIT",
+            "anchor": "returns"
+          }
+        },
+        "question_9": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return or exchange an item?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Returns and exchanges are handled under our Refund Policy. Items must be unworn, unwashed and in original packaging.</p>",
+            "anchor": ""
+          }
+        },
+        "question_10": {
+          "type": "question",
+          "settings": {
+            "question": "What if I receive an incorrect or damaged item?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Email us with your order number and clear photos and we will make it right.</p>",
+            "anchor": ""
+          }
+        },
+        "question_11": {
+          "type": "question",
+          "settings": {
+            "question": "How do DUEXBROX pieces fit?",
+            "answer": "<p>DUEXBROX pieces are designed around relaxed, oversized and streetwear-focused silhouettes. Please refer to the individual product description and size guide before ordering.</p>",
+            "anchor": ""
+          }
+        },
+        "question_12": {
+          "type": "question",
+          "settings": {
+            "question": "What size should I order?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Order your usual size for the intended oversized fit, or size down for a closer fit. Each product page has a Size Chart.</p>",
+            "anchor": ""
+          }
+        },
+        "question_13": {
+          "type": "question",
+          "settings": {
+            "question": "Will sold-out pieces be restocked?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Some pieces return, limited releases may not. Join the newsletter in the footer to hear first.</p>",
+            "anchor": ""
+          }
+        },
+        "group_14": {
+          "type": "group",
+          "settings": {
+            "title": "CARE & CONTACT",
+            "anchor": "care"
+          }
+        },
+        "question_15": {
+          "type": "question",
+          "settings": {
+            "question": "How should I care for my DUEXBROX pieces?",
+            "answer": "<p><em>Draft answer, confirm before launch.</em> Wash cold inside out, do not tumble dry, and avoid ironing directly on prints. Follow the care label on each piece.</p>",
+            "anchor": ""
+          }
+        },
+        "question_16": {
+          "type": "question",
+          "settings": {
+            "question": "How can I contact DUEXBROX?",
+            "answer": "<p>Email <a href=\"mailto:hello.duexbrox@gmail.com\">hello.duexbrox@gmail.com</a> or use the form below.</p>",
+            "anchor": "contact"
+          }
+        }
+      },
+      "block_order": [
+        "group_1",
+        "question_2",
+        "question_3",
+        "question_4",
+        "question_5",
+        "question_6",
+        "question_7",
+        "group_8",
+        "question_9",
+        "question_10",
+        "question_11",
+        "question_12",
+        "question_13",
+        "group_14",
+        "question_15",
+        "question_16"
+      ],
+      "settings": {
+        "breadcrumb": true,
+        "show_form": true,
+        "form_heading": "Have Any Other Questions?",
+        "button": "Send message"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

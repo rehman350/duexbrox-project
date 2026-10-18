@@ -1,0 +1,10 @@
+{%- comment -%}
+  Text-roll link: label rolls up, duplicate rises from below, arrow slides in.
+  @param {string} label - visible label
+  @param {string} url - destination
+  @param {string} [class] - extra classes
+{%- endcomment -%}
+<a href="{{ url | default: '#' }}" class="dx-roll {{ class }}">
+  <span class="dx-roll__t"><span data-text="{{ label | escape }}">{{ label | escape }}</span></span>
+  {%- render 'dx-icon', name: 'arrow', class: 'dx-roll__a' -%}
+</a>

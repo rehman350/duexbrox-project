@@ -1,0 +1,114 @@
+{%- comment -%} DUEXBROX About: centred philosophy (statement, paragraph, quote, signature) + bottom CTA. {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="dx dx-ab">
+  <div class="dx-wrap dx-ab__in" id="story">
+    {%- if s.statement != blank -%}<h1 class="dx-ab__h dx-rv">{{ s.statement | escape }}</h1>{%- endif -%}
+    {%- if s.text != blank -%}<div class="dx-ab__p dx-rv" style="--dx-d: .1s">{{ s.text }}</div>{%- endif -%}
+    <div id="philosophy">
+      {%- if s.quote != blank -%}<p class="dx-ab__q dx-rv" style="--dx-d: .2s">&quot;{{ s.quote | escape }}&quot;</p>{%- endif -%}
+      {%- if s.signature != blank -%}<p class="dx-ab__sig dx-rv" style="--dx-d: .3s">{{ s.signature | escape }}</p>{%- endif -%}
+    </div>
+  </div>
+  {%- if s.cta_label != blank -%}
+    <div class="dx-ab__cta">
+      {%- if s.cta_text != blank -%}<p>{{ s.cta_text | escape }}</p>{%- endif -%}
+      <a href="{{ s.cta_link | default: '#' }}" class="dx-ab__link dx-ul dx-ul--on">{{ s.cta_label | escape }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .dx-ab__in {
+    max-width: 1340px;
+    text-align: center;
+    padding-block: clamp(56px, 6vw, 110px);
+  }
+
+  .dx-ab__in > * + *,
+  #philosophy > * + * {
+    margin-top: clamp(20px, 2vw, 34px);
+  }
+
+  #philosophy {
+    margin-top: clamp(28px, 3vw, 48px);
+    scroll-margin-top: 120px;
+  }
+
+  #story {
+    scroll-margin-top: 120px;
+  }
+
+  .dx-ab__h {
+    font-family: var(--dx-fb);
+    font-weight: 600;
+    font-size: clamp(18px, 1.55vw, 28px);
+    line-height: 1.4;
+    max-width: 62ch;
+    margin-inline: auto;
+  }
+
+  .dx-ab__p {
+    font-size: clamp(15px, 1.15vw, 20px);
+    line-height: 1.8;
+    color: #4a4a4a;
+    margin-inline: auto;
+  }
+
+  .dx-ab__q {
+    font-family: var(--dx-fb);
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(18px, 1.55vw, 28px);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .dx-ab__sig {
+    font-family: var(--dx-fb);
+    font-weight: 700;
+    font-size: clamp(11px, 0.8vw, 14px);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #767676;
+  }
+
+  .dx-ab__cta {
+    display: grid;
+    justify-items: center;
+    gap: clamp(14px, 1.4vw, 22px);
+    padding-block: clamp(56px, 6vw, 110px);
+    border-top: 1px solid var(--dx-line);
+    text-align: center;
+  }
+
+  .dx-ab__cta p {
+    font-size: clamp(14px, 1vw, 18px);
+    color: #4a4a4a;
+  }
+
+  .dx-ab__link {
+    font-family: var(--dx-fb);
+    font-weight: 700;
+    font-size: clamp(14px, 1.2vw, 21px);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX About story",
+  "class": "dx-ab-section",
+  "settings": [
+    { "type": "text", "id": "statement", "label": "Statement", "default": "DUEXBROX is a contemporary streetwear label built around individuality, attitude and self-expression." },
+    { "type": "richtext", "id": "text", "label": "Paragraph", "default": "<p>Our approach is simple: strong silhouettes, considered details and everyday pieces that make an impact without trying too hard. From oversized tees and structured outerwear to relaxed cargos, every DUEXBROX piece is designed to be worn as part of a uniform, pieces that work together, but still carry their own identity.</p>" },
+    { "type": "text", "id": "quote", "label": "Quote", "default": "WE DON'T DESIGN TO FIT IN" },
+    { "type": "text", "id": "signature", "label": "Signature", "default": "DUEXBROX. WEAR IT YOUR WAY." },
+    { "type": "header", "content": "Bottom call to action" },
+    { "type": "text", "id": "cta_text", "label": "Text", "default": "Ready to wear it your way?" },
+    { "type": "text", "id": "cta_label", "label": "Link label", "default": "SHOP THE UNIFORMS" },
+    { "type": "url", "id": "cta_link", "label": "Link" }
+  ],
+  "presets": [{ "name": "DX About story" }]
+}
+{% endschema %}

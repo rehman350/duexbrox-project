@@ -2116,5 +2116,50 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "DUEXBROX",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Fonts used by every DX section. Defaults: Krona One (headings) and Jost (body) from Google Fonts."
+      },
+      {
+        "type": "text",
+        "id": "dx_font_heading",
+        "label": "Heading font family",
+        "default": "Krona One"
+      },
+      {
+        "type": "text",
+        "id": "dx_font_body",
+        "label": "Body font family",
+        "default": "Jost"
+      },
+      {
+        "type": "text",
+        "id": "dx_font_url",
+        "label": "Google Fonts stylesheet URL",
+        "default": "https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Krona+One&display=swap",
+        "info": "Change together with the family names above."
+      },
+      {
+        "type": "header",
+        "content": "Test images"
+      },
+      {
+        "type": "checkbox",
+        "id": "dx_test_images",
+        "label": "Use test product image",
+        "info": "Products without photos show the test image. Turn off once real photos are uploaded.",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "dx_test_image",
+        "label": "Test image override",
+        "info": "Optional. Defaults to the bundled black tee."
+      }
+    ]
   }
 ]

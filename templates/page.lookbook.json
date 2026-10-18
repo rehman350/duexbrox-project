@@ -1,0 +1,87 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "dx-uniforms",
+      "blocks": {
+        "uniform_1": {
+          "type": "uniform",
+          "settings": {
+            "number": "01",
+            "products": [],
+            "link": "/pages/uniform-01"
+          }
+        },
+        "uniform_2": {
+          "type": "uniform",
+          "settings": {
+            "number": "02",
+            "products": [],
+            "link": "/pages/uniform-02"
+          }
+        },
+        "uniform_3": {
+          "type": "uniform",
+          "settings": {
+            "number": "03",
+            "products": [],
+            "link": "/pages/uniform-03"
+          }
+        },
+        "uniform_4": {
+          "type": "uniform",
+          "settings": {
+            "number": "04",
+            "products": [],
+            "link": "/pages/uniform-04"
+          }
+        },
+        "uniform_5": {
+          "type": "uniform",
+          "settings": {
+            "number": "05",
+            "products": [],
+            "link": "/pages/uniform-05"
+          }
+        },
+        "uniform_6": {
+          "type": "uniform",
+          "settings": {
+            "number": "06",
+            "products": [],
+            "link": "/pages/uniform-06"
+          }
+        }
+      },
+      "block_order": [
+        "uniform_1",
+        "uniform_2",
+        "uniform_3",
+        "uniform_4",
+        "uniform_5",
+        "uniform_6"
+      ],
+      "settings": {
+        "layout": "grid",
+        "source": "blocks",
+        "limit": 6,
+        "heading": "LOOKBOOK",
+        "page_title": true,
+        "subtitle": "Complete curated looks, shop each piece individually.",
+        "link_label": "",
+        "link": ""
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

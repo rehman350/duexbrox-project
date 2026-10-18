@@ -1,0 +1,65 @@
+{%- comment -%} DUEXBROX product carousel (New Arrivals). Products, prices and images come from the chosen collection. {%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign col = s.collection
+  assign link = s.link | default: col.url | default: routes.all_products_collection_url
+-%}
+<section class="dx dx-prods" aria-labelledby="DxProdsH-{{ section.id }}">
+  <div class="dx-wrap">
+    <div class="dx-head">
+      <h2 class="dx-h dx-h--sec" id="DxProdsH-{{ section.id }}">{{ s.heading | escape }}</h2>
+      {%- if s.link_label != blank -%}
+        {%- render 'dx-roll', label: s.link_label, url: link -%}
+      {%- endif -%}
+    </div>
+
+    <div class="dx-car" data-dx-carousel style="--dx-car-arrow-top: 42%;">
+      <ul class="dx-car__track" data-dx-track role="list">
+        {%- if col != blank and col.products_count > 0 -%}
+          {%- for product in col.products limit: s.limit -%}
+            <li class="dx-rv" style="--dx-d: {{ forloop.index0 | modulo: 4 | times: 0.08 }}s">
+              {%- render 'dx-card', product: product, lazy: true -%}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..6) -%}
+            <li>{%- render 'dx-card', product: blank, index: i -%}</li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+      <button type="button" class="dx-arrow dx-arrow--prev dx-car__nav dx-car__nav--prev" data-dx-prev aria-label="Previous products" hidden>
+        {%- render 'dx-icon', name: 'chev-left' -%}
+      </button>
+      <button type="button" class="dx-arrow dx-car__nav dx-car__nav--next" data-dx-next aria-label="Next products">
+        {%- render 'dx-icon', name: 'chev-right' -%}
+      </button>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .dx-prods {
+    padding-block: var(--dx-sec) calc(var(--dx-sec) * 0.6);
+  }
+
+  .dx-prods .dx-car__track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Product carousel",
+  "class": "dx-prods-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "NEW ARRIVALS" },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Pick the DUEXBROX New Arrivals collection." },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 16, "step": 1, "default": 9 },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "VIEW ALL" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Defaults to the chosen collection." }
+  ],
+  "presets": [{ "name": "DX Product carousel" }]
+}
+{% endschema %}

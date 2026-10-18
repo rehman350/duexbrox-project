@@ -1,0 +1,33 @@
+{%- comment -%} DUEXBROX marquee: seamless loop built from two identical rows (second one hidden from screen readers). {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section
+  class="dx dx-mqs"
+  style="--dx-mq-speed: {{ s.speed }}s; --dx-mq-gap: {{ s.gap }}px; --dx-mqs-bg: {{ s.bg }}; --dx-mqs-fg: {{ s.fg }};"
+  aria-label="{{ s.text | escape }}"
+>
+  <div class="dx-mq">
+    {%- for r in (1..2) -%}
+      <div class="dx-mq__row" {% if forloop.last %}aria-hidden="true"{% endif %}>
+        {%- for i in (1..s.repeat) -%}
+          <span class="dx-mqs__t">{{ s.text | escape }}</span>
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DX Marquee",
+  "class": "dx-mqs-section",
+  "settings": [
+    { "type": "text", "id": "text", "label": "Text", "default": "PRESENCE OVER NOISE" },
+    { "type": "range", "id": "repeat", "label": "Repeats per row", "min": 2, "max": 8, "step": 1, "default": 4 },
+    { "type": "range", "id": "speed", "label": "Seconds per loop", "min": 8, "max": 60, "step": 1, "default": 22 },
+    { "type": "range", "id": "gap", "label": "Gap", "min": 24, "max": 200, "step": 4, "unit": "px", "default": 120 },
+    { "type": "color", "id": "bg", "label": "Background", "default": "#111111" },
+    { "type": "color", "id": "fg", "label": "Text", "default": "#ffffff" }
+  ],
+  "presets": [{ "name": "DX Marquee" }]
+}
+{% endschema %}

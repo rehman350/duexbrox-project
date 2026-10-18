@@ -1,0 +1,74 @@
+{%- comment -%} DUEXBROX 404 page. {%- endcomment -%}
+{%- assign s = section.settings -%}
+<div class="dx dx-404">
+  <div class="dx-wrap dx-404__in">
+    <p class="dx-404__code" aria-hidden="true">404</p>
+    <h1 class="dx-404__h">{{ s.heading | escape }}</h1>
+    <p class="dx-404__p">{{ s.text | escape }}</p>
+    <div class="dx-404__cta">
+      <a href="{{ s.link | default: routes.all_products_collection_url }}" class="dx-btn">{{ s.button | escape }}</a>
+      {%- render 'dx-roll', label: 'BACK HOME', url: routes.root_url -%}
+    </div>
+  </div>
+  <section class="dx-mqs" aria-hidden="true" style="--dx-mq-speed: 26s; --dx-mq-gap: 96px;">
+    <div class="dx-mq">
+      {%- for r in (1..2) -%}
+        <div class="dx-mq__row">
+          {%- for i in (1..4) -%}<span class="dx-mqs__t">PRESENCE OVER NOISE</span>{%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </section>
+</div>
+
+{% stylesheet %}
+  .dx-404__in {
+    text-align: center;
+    padding-block: clamp(72px, 10vw, 180px);
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+  }
+
+  .dx-404__code {
+    font-family: var(--dx-fh);
+    font-size: clamp(72px, 12vw, 200px);
+    line-height: 1;
+    color: #ececea;
+  }
+
+  .dx-404__h {
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: clamp(18px, 1.8vw, 30px);
+    text-transform: uppercase;
+  }
+
+  .dx-404__p {
+    color: #4a4a4a;
+    max-width: 46ch;
+  }
+
+  .dx-404__cta {
+    margin-top: 16px;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX 404",
+  "class": "dx-404-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "This page made too much noise" },
+    { "type": "text", "id": "text", "label": "Text", "default": "The page you are looking for has moved or no longer exists." },
+    { "type": "text", "id": "button", "label": "Button", "default": "Shop all products" },
+    { "type": "url", "id": "link", "label": "Button link" }
+  ],
+  "enabled_on": { "templates": ["404"] }
+}
+{% endschema %}

@@ -1,0 +1,80 @@
+{%- comment -%} DUEXBROX full-width image banner (About hero, campaign banners). {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="dx dx-bn" style="--dx-bn-ratio: {{ s.ratio }}; --dx-bn-pos: {{ s.position }};" {% if s.anchor != blank %}id="{{ s.anchor | handle }}"{% endif %}>
+  <div class="dx-media dx-bn__media">
+    {%- if s.image != blank -%}
+      {%- if s.image_mobile != blank -%}
+        <picture>
+          <source media="(max-width: 699px)" srcset="{{ s.image_mobile | image_url: width: 800 }} 800w, {{ s.image_mobile | image_url: width: 1200 }} 1200w, {{ s.image_mobile | image_url: width: 1600 }} 1600w" sizes="100vw">
+          {{ s.image | image_url: width: 3200 | image_tag: widths: '800,1200,1600,2000,2600,3200', sizes: '100vw', loading: s.loading, alt: s.image.alt | default: '' }}
+        </picture>
+      {%- else -%}
+        {{ s.image | image_url: width: 3200 | image_tag: widths: '800,1200,1600,2000,2600,3200', sizes: '100vw', loading: s.loading, alt: s.image.alt | default: '' }}
+      {%- endif -%}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'dx-ph' }}
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .dx-bn__media {
+    aspect-ratio: var(--dx-bn-ratio, 2 / 1);
+    max-height: 90svh;
+    width: 100%;
+    background: linear-gradient(180deg, #ececea, #bdbdbb);
+  }
+
+  .dx-bn__media img {
+    object-position: var(--dx-bn-pos, center);
+  }
+
+  .dx-bn__media picture {
+    position: absolute;
+    inset: 0;
+  }
+
+  @media (max-width: 699px) {
+    .dx-bn__media {
+      aspect-ratio: 4 / 5;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Image banner",
+  "class": "dx-bn-section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "About hero: model on the right, open grey space on the left. 2400 x 1200 px." },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (optional)" },
+    {
+      "type": "select", "id": "ratio", "label": "Shape",
+      "options": [
+        { "value": "2 / 1", "label": "Reference (2:1)" },
+        { "value": "16 / 9", "label": "16:9" },
+        { "value": "21 / 9", "label": "Wide 21:9" },
+        { "value": "3 / 2", "label": "3:2" }
+      ],
+      "default": "2 / 1"
+    },
+    {
+      "type": "select", "id": "position", "label": "Image focus",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "right center", "label": "Right" },
+        { "value": "left center", "label": "Left" },
+        { "value": "top", "label": "Top" }
+      ],
+      "default": "right center"
+    },
+    {
+      "type": "select", "id": "loading", "label": "Loading",
+      "options": [{ "value": "eager", "label": "First on page (eager)" }, { "value": "lazy", "label": "Below the fold (lazy)" }],
+      "default": "eager"
+    },
+    { "type": "text", "id": "anchor", "label": "Anchor id (optional)" }
+  ],
+  "presets": [{ "name": "DX Image banner" }]
+}
+{% endschema %}

@@ -1,0 +1,21 @@
+{%- comment -%}
+  DUEXBROX global design system: fonts, tokens, shared CSS and JS.
+  Rendered once from layout/theme.liquid <head>.
+{%- endcomment -%}
+{%- liquid
+  assign dx_fonts = settings.dx_font_url | default: 'https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Krona+One&display=swap'
+  assign dx_heading = settings.dx_font_heading | default: 'Krona One'
+  assign dx_body = settings.dx_font_body | default: 'Jost'
+-%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="{{ dx_fonts }}">
+<style>
+  :root {
+    --dx-fh: '{{ dx_heading }}', 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --dx-fb: '{{ dx_body }}', 'Helvetica Neue', Arial, sans-serif;
+  }
+</style>
+{{ 'dx-theme.css' | asset_url | stylesheet_tag }}
+<script>document.documentElement.classList.add('dx-js');</script>
+<script src="{{ 'dx-theme.js' | asset_url }}" defer></script>
