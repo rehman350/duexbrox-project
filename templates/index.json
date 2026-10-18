@@ -19,7 +19,7 @@
         "heading": "PRESENCE OVER NOISE",
         "text": "DESIGNED FOR THOSE WHO DON'T NEED TO BE THE LOUDEST TO BE NOTICED.",
         "cta_label": "SHOP COLLECTION 01",
-        "cta_link": "shopify://collections/all",
+        "cta_link": "shopify://collections/duexbrox-new-arrivals",
         "show_scroll": true,
         "scroll_label": "SCROLL",
         "preview": "dx-pv-hero.jpg"
@@ -29,10 +29,10 @@
       "type": "dx-products",
       "settings": {
         "heading": "NEW ARRIVALS",
-        "collection": "",
+        "collection": "duexbrox-new-arrivals",
         "limit": 9,
         "link_label": "VIEW ALL",
-        "link": "shopify://collections/all"
+        "link": "shopify://collections/duexbrox"
       }
     },
     "uniforms": {
@@ -153,7 +153,7 @@
             "text": "<p>Every order is packed in our signature foil bag. Minimal outside. Built to protect what matters inside.</p>",
             "image_side": "left",
             "cta": "ORDER NOW",
-            "link": "shopify://collections/all",
+            "link": "shopify://collections/duexbrox",
             "preview": "dx-pv-pack.jpg"
           }
         }

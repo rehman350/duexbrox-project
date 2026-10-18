@@ -1,10 +1,10 @@
 {%- comment -%} DUEXBROX product carousel (New Arrivals). Products, prices and images come from the chosen collection. {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  # Fallbacks keep the row filled before a collection is picked: new-arrivals, then duexbrox, then all products.
+  # Fallbacks keep the row filled before a collection is picked: duexbrox-new-arrivals, then duexbrox, then all products.
   assign col = s.collection
   if col == blank
-    assign col = collections['new-arrivals']
+    assign col = collections['duexbrox-new-arrivals']
   endif
   if col == blank or col.products_count == 0
     assign col = collections['duexbrox']
