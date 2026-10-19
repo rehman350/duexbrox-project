@@ -69,13 +69,77 @@
             "label": "EDITORIAL",
             "link": "/pages/editorial"
           }
+        },
+        "mlink_1": {
+          "type": "mlink",
+          "settings": {
+            "label": "NEW ARRIVALS",
+            "link": "shopify://collections/duexbrox-new-arrivals"
+          }
+        },
+        "mlink_2": {
+          "type": "mlink",
+          "settings": {
+            "label": "T-SHIRTS",
+            "link": "shopify://collections/t-shirts"
+          }
+        },
+        "mlink_3": {
+          "type": "mlink",
+          "settings": {
+            "label": "HOODIES",
+            "link": "shopify://collections/hoodies"
+          }
+        },
+        "mlink_4": {
+          "type": "mlink",
+          "settings": {
+            "label": "PANTS",
+            "link": "shopify://collections/pants"
+          }
+        },
+        "mlink_5": {
+          "type": "mlink",
+          "settings": {
+            "label": "SHORTS",
+            "link": "shopify://collections/shorts"
+          }
+        },
+        "mlink_6": {
+          "type": "mlink",
+          "settings": {
+            "label": "LOOKBOOK",
+            "link": "shopify://pages/lookbook"
+          }
+        },
+        "mlink_7": {
+          "type": "mlink",
+          "settings": {
+            "label": "CONTACT",
+            "link": "shopify://pages/contact"
+          }
+        },
+        "mlink_8": {
+          "type": "mlink",
+          "settings": {
+            "label": "FAQ",
+            "link": "shopify://pages/duexbrox-faq"
+          }
         }
       },
       "block_order": [
         "link_1",
         "link_2",
         "link_3",
-        "link_4"
+        "link_4",
+        "mlink_1",
+        "mlink_2",
+        "mlink_3",
+        "mlink_4",
+        "mlink_5",
+        "mlink_6",
+        "mlink_7",
+        "mlink_8"
       ],
       "settings": {
         "logo_width": 150,

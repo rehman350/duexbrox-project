@@ -14,6 +14,7 @@
     assign use_menu = true
   endif
   assign links = section.blocks | where: 'type', 'link'
+  assign mlinks = section.blocks | where: 'type', 'mlink'
 -%}
 
 {%- capture nav_items -%}
@@ -50,7 +51,7 @@
           aria-controls="DxMenu-{{ section.id }}"
         >
           <span class="dx-sr">Menu</span>
-          <span class="dx-hd__bars" aria-hidden="true"><i></i><i></i></span>
+          <span class="dx-hd__bars" aria-hidden="true"><i></i><i></i><i></i></span>
         </button>
 
         <a href="{{ routes.root_url }}" class="dx-hd__logo" aria-label="{{ shop.name | escape }} home">
@@ -65,7 +66,7 @@
           <ul>{{ nav_items }}</ul>
         </nav>
 
-        <a href="{{ routes.cart_url }}" class="dx-hd__cart dx-ul" aria-label="Cart, {{ cart.item_count }} items">
+        <a href="{{ routes.cart_url }}" class="dx-hd__cart dx-ul" data-dx-cart-open aria-haspopup="dialog" aria-label="Cart, {{ cart.item_count }} items">
           <span>{{ section.settings.cart_label | escape }}</span>
           <span class="dx-hd__sep" aria-hidden="true">|</span>
           <span aria-hidden="true">( <span data-dx-cart-count>{{ cart.item_count }}</span> )</span>
@@ -77,7 +78,14 @@
   <div class="dx-hd__menu" id="DxMenu-{{ section.id }}" data-dx-menu>
     <nav aria-label="Mobile">
       <ul class="dx-hd__mlist">{{ nav_items }}</ul>
-      <a href="{{ routes.cart_url }}" class="dx-hd__mcart">
+      {%- if mlinks.size > 0 -%}
+        <ul class="dx-hd__msub">
+          {%- for block in mlinks -%}
+            <li {{ block.shopify_attributes }}><a href="{{ block.settings.link | default: '#' }}" class="dx-ul">{{ block.settings.label | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="dx-hd__mcart" data-dx-cart-open aria-haspopup="dialog">
         {{ section.settings.cart_label | escape }} ( <span data-dx-cart-count>{{ cart.item_count }}</span> )
       </a>
     </nav>
@@ -195,10 +203,10 @@
 
   .dx-hd__burger {
     display: none;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     padding: 0;
-    margin-left: -8px;
+    margin-left: -11px;
     border: 0;
     background: none;
     cursor: pointer;
@@ -208,7 +216,7 @@
   .dx-hd__bars {
     position: relative;
     width: 22px;
-    height: 10px;
+    height: 16px;
     display: block;
   }
 
@@ -218,14 +226,17 @@
     width: 100%;
     height: 1.5px;
     background: currentColor;
-    transition: transform 0.4s var(--dx-ease), top 0.4s var(--dx-ease);
+    transition: transform 0.4s var(--dx-ease), top 0.4s var(--dx-ease), opacity 0.25s var(--dx-ease);
   }
 
-  .dx-hd__bars i:first-child { top: 0; }
-  .dx-hd__bars i:last-child { top: 8.5px; }
+  /* Three lines when closed; the middle one fades and the outer two cross into an X when open. */
+  .dx-hd__bars i:nth-child(1) { top: 1px; }
+  .dx-hd__bars i:nth-child(2) { top: 7.25px; }
+  .dx-hd__bars i:nth-child(3) { top: 13.5px; }
 
-  .dx-hdr.is-menu .dx-hd__bars i:first-child { top: 4.25px; transform: rotate(45deg); }
-  .dx-hdr.is-menu .dx-hd__bars i:last-child { top: 4.25px; transform: rotate(-45deg); }
+  .dx-hdr.is-menu .dx-hd__bars i:nth-child(1) { top: 7.25px; transform: rotate(45deg); }
+  .dx-hdr.is-menu .dx-hd__bars i:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
+  .dx-hdr.is-menu .dx-hd__bars i:nth-child(3) { top: 7.25px; transform: rotate(-45deg); }
 
   .dx-hd__menu {
     position: fixed;
@@ -270,6 +281,48 @@
     text-transform: uppercase;
     letter-spacing: 0.02em;
   }
+
+  .dx-hd__msub {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--dx-line);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 16px;
+  }
+
+  .dx-hd__msub a {
+    display: inline-block;
+    padding: 8px 0;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Menu items slide up one after another as the panel opens. */
+  .dx-hd__mlist li,
+  .dx-hd__msub,
+  .dx-hd__mcart {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.45s var(--dx-ease), transform 0.45s var(--dx-ease);
+  }
+
+  .dx-hdr.is-menu .dx-hd__mlist li,
+  .dx-hdr.is-menu .dx-hd__msub,
+  .dx-hdr.is-menu .dx-hd__mcart {
+    opacity: 1;
+    transform: none;
+  }
+
+  .dx-hdr.is-menu .dx-hd__mlist li:nth-child(1) { transition-delay: 0.08s; }
+  .dx-hdr.is-menu .dx-hd__mlist li:nth-child(2) { transition-delay: 0.13s; }
+  .dx-hdr.is-menu .dx-hd__mlist li:nth-child(3) { transition-delay: 0.18s; }
+  .dx-hdr.is-menu .dx-hd__mlist li:nth-child(4) { transition-delay: 0.23s; }
+  .dx-hdr.is-menu .dx-hd__mlist li:nth-child(n + 5) { transition-delay: 0.28s; }
+  .dx-hdr.is-menu .dx-hd__msub,
+  .dx-hdr.is-menu .dx-hd__mcart { transition-delay: 0.32s; }
 
   .dx-hd__mcart {
     display: inline-block;
@@ -318,7 +371,7 @@
   "name": "DX Header",
   "class": "dx-header-section",
   "enabled_on": { "groups": ["header"] },
-  "max_blocks": 8,
+  "max_blocks": 20,
   "settings": [
     { "type": "image_picker", "id": "logo", "label": "Logo image (optional)", "info": "Leave empty to use the text wordmark." },
     { "type": "range", "id": "logo_width", "label": "Logo width", "min": 80, "max": 300, "step": 5, "unit": "px", "default": 150 },
@@ -335,6 +388,15 @@
       "name": "Link",
       "settings": [
         { "type": "text", "id": "label", "label": "Label", "default": "SHOP" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "mlink",
+      "name": "Mobile menu link",
+      "settings": [
+        { "type": "paragraph", "content": "Shown only in the mobile menu, under the main links." },
+        { "type": "text", "id": "label", "label": "Label", "default": "CONTACT" },
         { "type": "url", "id": "link", "label": "Link" }
       ]
     }

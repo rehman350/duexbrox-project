@@ -16,7 +16,8 @@
         "position": "right center",
         "loading": "eager",
         "anchor": "",
-        "preview": "dx-pv-about.jpg"
+        "preview": "dx-pv-about.jpg",
+        "image": "shopify://shop_images/dx-about.jpg"
       }
     },
     "marquee": {

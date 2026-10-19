@@ -22,7 +22,8 @@
         "cta_link": "shopify://collections/duexbrox-new-arrivals",
         "show_scroll": true,
         "scroll_label": "SCROLL",
-        "preview": "dx-pv-hero.jpg"
+        "preview": "dx-pv-hero.jpg",
+        "image": "shopify://shop_images/dx-hero.jpg"
       }
     },
     "new_arrivals": {
@@ -45,7 +46,8 @@
             "products": [],
             "link": "/pages/uniform-01",
             "preview": "dx-pv-uf-01.jpg",
-            "handles": "i-dont-say-hi-back-tee, the-cargo-short"
+            "handles": "i-dont-say-hi-back-tee, the-cargo-short",
+            "image": "shopify://shop_images/dx-uniform-01.jpg"
           }
         },
         "uniform_2": {
@@ -75,7 +77,8 @@
             "products": [],
             "link": "/pages/uniform-04",
             "preview": "dx-pv-uf-04.jpg",
-            "handles": "the-sherpa-zip, the-wide-cargo"
+            "handles": "the-sherpa-zip, the-wide-cargo",
+            "image": "shopify://shop_images/dx-uniform-04.jpg"
           }
         },
         "uniform_5": {
@@ -85,7 +88,8 @@
             "products": [],
             "link": "/pages/uniform-05",
             "preview": "dx-pv-uf-05.jpg",
-            "handles": "the-quote-tee, the-wide-cargo"
+            "handles": "the-quote-tee, the-wide-cargo",
+            "image": "shopify://shop_images/dx-uniform-05.jpg"
           }
         },
         "uniform_6": {
@@ -95,7 +99,8 @@
             "products": [],
             "link": "/pages/uniform-06",
             "preview": "dx-pv-uf-06.jpg",
-            "handles": "the-heavyweight-hoodie, the-cargo-short"
+            "handles": "the-heavyweight-hoodie, the-cargo-short",
+            "image": "shopify://shop_images/dx-uniform-06.jpg"
           }
         }
       },
@@ -142,7 +147,8 @@
             "cta": "VIEW PRODUCT",
             "link": "",
             "preview": "dx-pv-leopard.jpg",
-            "handle": "leopard-leather-pants"
+            "handle": "leopard-leather-pants",
+            "image": "shopify://shop_images/dx-featured-leopard.jpg"
           }
         },
         "content_2": {
@@ -154,7 +160,8 @@
             "image_side": "left",
             "cta": "ORDER NOW",
             "link": "shopify://collections/duexbrox",
-            "preview": "dx-pv-pack.jpg"
+            "preview": "dx-pv-pack.jpg",
+            "image": "shopify://shop_images/dx-packaging.jpg"
           }
         }
       },
@@ -174,7 +181,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-02.jpg"
+            "preview": "dx-pv-ed-02.jpg",
+            "image": "shopify://shop_images/dx-editorial-02.jpg"
           }
         },
         "image_2": {
@@ -182,7 +190,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-03.jpg"
+            "preview": "dx-pv-ed-03.jpg",
+            "image": "shopify://shop_images/dx-editorial-03.jpg"
           }
         },
         "image_3": {
@@ -190,7 +199,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-09.jpg"
+            "preview": "dx-pv-ed-09.jpg",
+            "image": "shopify://shop_images/dx-editorial-09.jpg"
           }
         }
       },
