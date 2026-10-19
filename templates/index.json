@@ -12,6 +12,8 @@
     "hero": {
       "type": "dx-hero",
       "settings": {
+        "image": "shopify://shop_images/dx-hero.jpg",
+        "preview": "dx-pv-hero.jpg",
         "position": "center",
         "height": "ref",
         "overlay": 25,
@@ -21,9 +23,7 @@
         "cta_label": "SHOP COLLECTION 01",
         "cta_link": "shopify://collections/duexbrox-new-arrivals",
         "show_scroll": true,
-        "scroll_label": "SCROLL",
-        "preview": "dx-pv-hero.jpg",
-        "image": "shopify://shop_images/dx-hero.jpg"
+        "scroll_label": "SCROLL"
       }
     },
     "new_arrivals": {
@@ -43,64 +43,74 @@
           "type": "uniform",
           "settings": {
             "number": "01",
-            "products": [],
-            "link": "/pages/uniform-01",
+            "image": "shopify://shop_images/dx-uniform-01.jpg",
             "preview": "dx-pv-uf-01.jpg",
+            "products": [],
             "handles": "i-dont-say-hi-back-tee, the-cargo-short",
-            "image": "shopify://shop_images/dx-uniform-01.jpg"
+            "link": "/pages/uniform-01"
           }
         },
         "uniform_2": {
           "type": "uniform",
           "settings": {
             "number": "02",
-            "products": [],
-            "link": "/pages/uniform-02",
             "preview": "dx-pv-uf-02.jpg",
-            "handles": "unapologetic-tee, leopard-leather-pants"
+            "products": [],
+            "handles": "unapologetic-tee, leopard-leather-pants",
+            "link": "/pages/uniform-02"
           }
         },
         "uniform_3": {
           "type": "uniform",
           "settings": {
             "number": "03",
-            "products": [],
-            "link": "/pages/uniform-03",
             "preview": "dx-pv-uf-03.jpg",
-            "handles": "digital-tee, the-wide-cargo"
+            "products": [],
+            "handles": "digital-tee, the-wide-cargo",
+            "link": "/pages/uniform-03"
           }
         },
         "uniform_4": {
           "type": "uniform",
           "settings": {
             "number": "04",
-            "products": [],
-            "link": "/pages/uniform-04",
+            "image": "shopify://shop_images/dx-uniform-04.jpg",
             "preview": "dx-pv-uf-04.jpg",
+            "products": [],
             "handles": "the-sherpa-zip, the-wide-cargo",
-            "image": "shopify://shop_images/dx-uniform-04.jpg"
+            "link": "/pages/uniform-04"
+          }
+        },
+        "uniform_4PC6rp": {
+          "type": "uniform",
+          "settings": {
+            "number": "01",
+            "preview": "",
+            "products": [],
+            "handles": "",
+            "link": ""
           }
         },
         "uniform_5": {
           "type": "uniform",
           "settings": {
             "number": "05",
-            "products": [],
-            "link": "/pages/uniform-05",
+            "image": "shopify://shop_images/dx-uniform-05.jpg",
             "preview": "dx-pv-uf-05.jpg",
+            "products": [],
             "handles": "the-quote-tee, the-wide-cargo",
-            "image": "shopify://shop_images/dx-uniform-05.jpg"
+            "link": "/pages/uniform-05"
           }
         },
         "uniform_6": {
           "type": "uniform",
           "settings": {
             "number": "06",
-            "products": [],
-            "link": "/pages/uniform-06",
+            "image": "shopify://shop_images/dx-uniform-06.jpg",
             "preview": "dx-pv-uf-06.jpg",
+            "products": [],
             "handles": "the-heavyweight-hoodie, the-cargo-short",
-            "image": "shopify://shop_images/dx-uniform-06.jpg"
+            "link": "/pages/uniform-06"
           }
         }
       },
@@ -109,6 +119,7 @@
         "uniform_2",
         "uniform_3",
         "uniform_4",
+        "uniform_4PC6rp",
         "uniform_5",
         "uniform_6"
       ],
@@ -143,12 +154,13 @@
             "label": "FEATURED PIECE",
             "product": "",
             "title": "",
-            "image_side": "right",
-            "cta": "VIEW PRODUCT",
-            "link": "",
+            "text": "",
+            "image": "shopify://shop_images/dx-featured-leopard.jpg",
             "preview": "dx-pv-leopard.jpg",
             "handle": "leopard-leather-pants",
-            "image": "shopify://shop_images/dx-featured-leopard.jpg"
+            "image_side": "right",
+            "cta": "VIEW PRODUCT",
+            "link": ""
           }
         },
         "content_2": {
@@ -157,11 +169,11 @@
             "label": "PACKAGED WITH PURPOSE",
             "title": "PREMIUM PACKAGING",
             "text": "<p>Every order is packed in our signature foil bag. Minimal outside. Built to protect what matters inside.</p>",
+            "image": "shopify://shop_images/dx-packaging.jpg",
+            "preview": "dx-pv-pack.jpg",
             "image_side": "left",
             "cta": "ORDER NOW",
-            "link": "shopify://collections/duexbrox",
-            "preview": "dx-pv-pack.jpg",
-            "image": "shopify://shop_images/dx-packaging.jpg"
+            "link": "shopify://collections/duexbrox"
           }
         }
       },
@@ -179,28 +191,31 @@
         "image_1": {
           "type": "image",
           "settings": {
-            "shape": "portrait",
-            "link": "",
+            "image": "shopify://shop_images/dx-editorial-02.jpg",
             "preview": "dx-pv-ed-02.jpg",
-            "image": "shopify://shop_images/dx-editorial-02.jpg"
+            "alt": "",
+            "shape": "portrait",
+            "link": ""
           }
         },
         "image_2": {
           "type": "image",
           "settings": {
-            "shape": "portrait",
-            "link": "",
+            "image": "shopify://shop_images/dx-editorial-03.jpg",
             "preview": "dx-pv-ed-03.jpg",
-            "image": "shopify://shop_images/dx-editorial-03.jpg"
+            "alt": "",
+            "shape": "portrait",
+            "link": ""
           }
         },
         "image_3": {
           "type": "image",
           "settings": {
-            "shape": "portrait",
-            "link": "",
+            "image": "shopify://shop_images/dx-editorial-09.jpg",
             "preview": "dx-pv-ed-09.jpg",
-            "image": "shopify://shop_images/dx-editorial-09.jpg"
+            "alt": "",
+            "shape": "portrait",
+            "link": ""
           }
         }
       },
