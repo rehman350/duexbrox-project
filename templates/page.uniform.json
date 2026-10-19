@@ -16,70 +16,70 @@
           "type": "uniform",
           "settings": {
             "page": "",
-            "number": "01",
-            "products": [],
-            "preview": "dx-pv-ufh-01.jpg",
-            "handles": "i-dont-say-hi-back-tee, the-cargo-short",
             "page_handle": "uniform-01",
-            "image": "shopify://shop_images/dx-uniform-01.jpg"
+            "number": "01",
+            "image": "shopify://shop_images/dx-uniform-01.jpg",
+            "preview": "dx-pv-ufh-01.jpg",
+            "products": [],
+            "handles": "i-dont-say-hi-back-tee, the-cargo-short"
           }
         },
         "uniform_2": {
           "type": "uniform",
           "settings": {
             "page": "",
+            "page_handle": "uniform-02",
             "number": "02",
-            "products": [],
             "preview": "dx-pv-ufh-02.jpg",
-            "handles": "unapologetic-tee, leopard-leather-pants",
-            "page_handle": "uniform-02"
+            "products": [],
+            "handles": "unapologetic-tee, leopard-leather-pants"
           }
         },
         "uniform_3": {
           "type": "uniform",
           "settings": {
             "page": "",
+            "page_handle": "uniform-03",
             "number": "03",
-            "products": [],
             "preview": "dx-pv-ufh-03.jpg",
-            "handles": "digital-tee, the-wide-cargo",
-            "page_handle": "uniform-03"
+            "products": [],
+            "handles": "digital-tee, the-wide-cargo"
           }
         },
         "uniform_4": {
           "type": "uniform",
           "settings": {
             "page": "",
-            "number": "04",
-            "products": [],
-            "preview": "dx-pv-ufh-04.jpg",
-            "handles": "the-sherpa-zip, the-wide-cargo",
             "page_handle": "uniform-04",
-            "image": "shopify://shop_images/dx-uniform-04.jpg"
+            "number": "04",
+            "image": "shopify://shop_images/dx-uniform-04.jpg",
+            "preview": "dx-pv-ufh-04.jpg",
+            "products": [],
+            "handles": "the-sherpa-zip, the-wide-cargo"
           }
         },
         "uniform_5": {
           "type": "uniform",
           "settings": {
             "page": "",
-            "number": "05",
-            "products": [],
-            "preview": "dx-pv-ufh-05.jpg",
-            "handles": "the-quote-tee, the-wide-cargo",
             "page_handle": "uniform-05",
-            "image": "shopify://shop_images/dx-uniform-05.jpg"
+            "number": "05",
+            "image": "shopify://shop_images/dx-uniform-05.jpg",
+            "preview": "dx-pv-ufh-05.jpg",
+            "products": [],
+            "handles": "the-quote-tee, the-wide-cargo"
           }
         },
         "uniform_6": {
           "type": "uniform",
           "settings": {
             "page": "",
-            "number": "06",
-            "products": [],
-            "preview": "dx-pv-ufh-06.jpg",
-            "handles": "the-heavyweight-hoodie, the-cargo-short",
             "page_handle": "uniform-06",
-            "image": "shopify://shop_images/dx-uniform-06.jpg"
+            "number": "06",
+            "image": "shopify://shop_images/dx-uniform-06.jpg",
+            "preview": "dx-pv-ufh-06.jpg",
+            "products": [],
+            "handles": "the-heavyweight-hoodie, the-cargo-short"
           }
         }
       },
