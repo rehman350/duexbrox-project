@@ -20,7 +20,8 @@
             "products": [],
             "preview": "dx-pv-ufh-01.jpg",
             "handles": "i-dont-say-hi-back-tee, the-cargo-short",
-            "page_handle": "uniform-01"
+            "page_handle": "uniform-01",
+            "image": "shopify://shop_images/dx-uniform-01.jpg"
           }
         },
         "uniform_2": {
@@ -53,7 +54,8 @@
             "products": [],
             "preview": "dx-pv-ufh-04.jpg",
             "handles": "the-sherpa-zip, the-wide-cargo",
-            "page_handle": "uniform-04"
+            "page_handle": "uniform-04",
+            "image": "shopify://shop_images/dx-uniform-04.jpg"
           }
         },
         "uniform_5": {
@@ -64,7 +66,8 @@
             "products": [],
             "preview": "dx-pv-ufh-05.jpg",
             "handles": "the-quote-tee, the-wide-cargo",
-            "page_handle": "uniform-05"
+            "page_handle": "uniform-05",
+            "image": "shopify://shop_images/dx-uniform-05.jpg"
           }
         },
         "uniform_6": {
@@ -75,7 +78,8 @@
             "products": [],
             "preview": "dx-pv-ufh-06.jpg",
             "handles": "the-heavyweight-hoodie, the-cargo-short",
-            "page_handle": "uniform-06"
+            "page_handle": "uniform-06",
+            "image": "shopify://shop_images/dx-uniform-06.jpg"
           }
         }
       },

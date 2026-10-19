@@ -17,7 +17,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-01.jpg"
+            "preview": "dx-pv-ed-01.jpg",
+            "image": "shopify://shop_images/dx-editorial-01.jpg"
           }
         },
         "image_2": {
@@ -25,7 +26,8 @@
           "settings": {
             "shape": "landscape",
             "link": "",
-            "preview": "dx-pv-ed-02.jpg"
+            "preview": "dx-pv-ed-02.jpg",
+            "image": "shopify://shop_images/dx-editorial-02.jpg"
           }
         },
         "image_3": {
@@ -33,7 +35,8 @@
           "settings": {
             "shape": "landscape",
             "link": "",
-            "preview": "dx-pv-ed-03.jpg"
+            "preview": "dx-pv-ed-03.jpg",
+            "image": "shopify://shop_images/dx-editorial-03.jpg"
           }
         },
         "image_4": {
@@ -41,7 +44,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-04.jpg"
+            "preview": "dx-pv-ed-04.jpg",
+            "image": "shopify://shop_images/dx-editorial-04.jpg"
           }
         },
         "image_5": {
@@ -49,7 +53,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-05.jpg"
+            "preview": "dx-pv-ed-05.jpg",
+            "image": "shopify://shop_images/dx-editorial-05.jpg"
           }
         },
         "image_6": {
@@ -57,7 +62,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-06.jpg"
+            "preview": "dx-pv-ed-06.jpg",
+            "image": "shopify://shop_images/dx-editorial-06.jpg"
           }
         },
         "image_7": {
@@ -65,7 +71,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-07.jpg"
+            "preview": "dx-pv-ed-07.jpg",
+            "image": "shopify://shop_images/dx-editorial-07.jpg"
           }
         },
         "image_8": {
@@ -73,7 +80,8 @@
           "settings": {
             "shape": "landscape",
             "link": "",
-            "preview": "dx-pv-ed-08.jpg"
+            "preview": "dx-pv-ed-08.jpg",
+            "image": "shopify://shop_images/dx-hero.jpg"
           }
         },
         "image_9": {
@@ -81,7 +89,8 @@
           "settings": {
             "shape": "landscape",
             "link": "",
-            "preview": "dx-pv-ed-09.jpg"
+            "preview": "dx-pv-ed-09.jpg",
+            "image": "shopify://shop_images/dx-editorial-09.jpg"
           }
         },
         "image_10": {
@@ -89,7 +98,8 @@
           "settings": {
             "shape": "portrait",
             "link": "",
-            "preview": "dx-pv-ed-10.jpg"
+            "preview": "dx-pv-ed-10.jpg",
+            "image": "shopify://shop_images/dx-editorial-10.jpg"
           }
         }
       },

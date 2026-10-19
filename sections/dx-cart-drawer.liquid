@@ -1,0 +1,366 @@
+{%- comment -%}
+  DUEXBROX cart drawer. Rendered once from layout/theme.liquid as a static section so the
+  Section Rendering API can refresh it ("dx-cart-drawer") after every cart change.
+  Uses Shopify's real cart: quantities go through /cart/change.js, checkout posts to /cart.
+  Without JavaScript the header CART link still opens the cart page.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<div class="dx dx-cd" data-dx-cart-drawer data-enabled="{{ s.enabled }}" data-count="{{ cart.item_count }}">
+  <div class="dx-cd__ov" data-dx-cd-close aria-hidden="true"></div>
+  <aside
+    class="dx-cd__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="DxCdTitle"
+    tabindex="-1"
+  >
+    <div class="dx-cd__head">
+      <h2 class="dx-cd__title" id="DxCdTitle">
+        {{ s.heading | escape }} <span aria-hidden="true">(</span><span data-dx-cd-count>{{ cart.item_count }}</span><span aria-hidden="true">)</span>
+      </h2>
+      <button type="button" class="dx-cd__x" data-dx-cd-close aria-label="Close cart">
+        {%- render 'dx-icon', name: 'close' -%}
+      </button>
+    </div>
+
+    {%- if cart.item_count > 0 -%}
+      <form action="{{ routes.cart_url }}" method="post" class="dx-cd__form" id="DxCdForm">
+        <ul role="list" class="dx-cd__list">
+          {%- for item in cart.items -%}
+            <li class="dx-cd__row" data-key="{{ item.key }}">
+              <a href="{{ item.url }}" class="dx-media dx-cd__img" tabindex="-1">
+                {%- if item.image -%}
+                  {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.product.title, widths: '120,240,300', sizes: '110px' }}
+                {%- else -%}
+                  {%- render 'dx-ph', name: 'product-apparel-1', product: item.product -%}
+                {%- endif -%}
+              </a>
+              <div class="dx-cd__info">
+                <div class="dx-cd__top">
+                  <a href="{{ item.url }}" class="dx-cd__name">{{ item.product.title | escape }}</a>
+                  <p class="dx-cd__price">{{ item.final_line_price | money }}</p>
+                </div>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="dx-cd__meta">
+                    {%- for option in item.options_with_values -%}
+                      {{ option.name | escape }}: {{ option.value | escape }}{% unless forloop.last %} / {% endunless %}
+                    {%- endfor -%}
+                  </p>
+                {%- endunless -%}
+                {%- if item.quantity > 1 -%}
+                  <p class="dx-cd__meta">{{ item.final_price | money }} each</p>
+                {%- endif -%}
+                {%- for d in item.line_level_discount_allocations -%}
+                  <p class="dx-cd__meta">{{ d.discount_application.title | escape }} (-{{ d.amount | money }})</p>
+                {%- endfor -%}
+                <div class="dx-cd__ctl">
+                  <div class="dx-qty dx-qty--sm">
+                    <button type="button" class="dx-qty__b" data-dx-cd-step="-1" aria-label="Decrease quantity of {{ item.product.title | escape }}">{%- render 'dx-icon', name: 'minus' -%}</button>
+                    <input
+                      type="number"
+                      name="updates[]"
+                      value="{{ item.quantity }}"
+                      min="0"
+                      {% if item.variant.quantity_rule.max != null %}max="{{ item.variant.quantity_rule.max }}"{% endif %}
+                      step="{{ item.variant.quantity_rule.increment | default: 1 }}"
+                      inputmode="numeric"
+                      aria-label="Quantity of {{ item.product.title | escape }}"
+                      data-dx-cd-qty
+                    >
+                    <button type="button" class="dx-qty__b" data-dx-cd-step="1" aria-label="Increase quantity of {{ item.product.title | escape }}">{%- render 'dx-icon', name: 'plus' -%}</button>
+                  </div>
+                  <a href="{{ item.url_to_remove }}" class="dx-cd__rm dx-ul dx-ul--on" data-dx-cd-remove>Remove</a>
+                </div>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <div class="dx-cd__foot">
+          {%- for d in cart.cart_level_discount_applications -%}
+            <p class="dx-cd__line"><span>{{ d.title | escape }}</span><span>-{{ d.total_allocated_amount | money }}</span></p>
+          {%- endfor -%}
+          <p class="dx-cd__line dx-cd__line--total">
+            <span>Subtotal</span>
+            <span>{{ cart.total_price | money_with_currency }}</span>
+          </p>
+          <p class="dx-cd__note">{{ s.tax_note | escape }}</p>
+          <p class="dx-cd__err" data-dx-cd-err role="alert" hidden></p>
+          <button type="submit" name="checkout" class="dx-btn dx-btn--block dx-cd__go">{{ s.checkout_label | escape }}</button>
+          <a href="{{ routes.cart_url }}" class="dx-cd__view dx-ul dx-ul--on">View cart</a>
+        </div>
+      </form>
+    {%- else -%}
+      <div class="dx-cd__empty">
+        <p>{{ s.empty_text | escape }}</p>
+        <a href="{{ s.empty_link | default: routes.all_products_collection_url }}" class="dx-btn">{{ s.empty_cta | escape }}</a>
+      </div>
+    {%- endif -%}
+  </aside>
+</div>
+
+{% stylesheet %}
+  .dx-cd {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0s linear 0.5s;
+  }
+
+  .dx-cd.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    transition: visibility 0s;
+  }
+
+  .dx-cd__ov {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.45s var(--dx-ease);
+    cursor: pointer;
+  }
+
+  .dx-cd.is-open .dx-cd__ov {
+    opacity: 1;
+  }
+
+  .dx-cd__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(460px, calc(100% - 44px));
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    color: var(--dx-black);
+    transform: translateX(100%);
+    transition: transform 0.5s var(--dx-ease);
+    outline: none;
+  }
+
+  .dx-cd.is-open .dx-cd__panel {
+    transform: none;
+  }
+
+  .dx-cd__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px clamp(18px, 2vw, 28px);
+    border-bottom: 1px solid var(--dx-line);
+  }
+
+  .dx-cd__title {
+    margin: 0;
+    font-family: var(--dx-fh);
+    font-weight: 400;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .dx-cd__x {
+    width: 44px;
+    height: 44px;
+    margin-right: -12px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .dx-cd__x svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.35s var(--dx-ease);
+  }
+
+  .dx-cd__x:hover svg {
+    transform: rotate(90deg);
+  }
+
+  .dx-cd__form {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dx-cd__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    list-style: none;
+    margin: 0;
+    padding: 0 clamp(18px, 2vw, 28px);
+  }
+
+  .dx-cd__row {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--dx-line);
+    transition: opacity 0.3s;
+  }
+
+  .dx-cd.is-busy .dx-cd__row.is-busy {
+    opacity: 0.45;
+  }
+
+  .dx-cd__img {
+    aspect-ratio: 1;
+    background: var(--dx-card);
+  }
+
+  .dx-cd__img img {
+    object-fit: contain;
+  }
+
+  .dx-cd__info {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .dx-cd__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .dx-cd__name {
+    font-family: var(--dx-fh);
+    font-size: 12px;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .dx-cd__price {
+    margin: 0;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .dx-cd__meta {
+    margin: 0;
+    font-size: 12px;
+    color: var(--dx-muted);
+  }
+
+  .dx-cd__ctl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 18px;
+    margin-top: 6px;
+  }
+
+  .dx-qty--sm .dx-qty__b {
+    width: 34px;
+    height: 36px;
+  }
+
+  .dx-qty--sm input {
+    width: 32px;
+    font-size: 14px;
+  }
+
+  .dx-cd__rm {
+    font-size: 12px;
+    color: var(--dx-muted);
+  }
+
+  .dx-cd__foot {
+    display: grid;
+    gap: 12px;
+    padding: 20px clamp(18px, 2vw, 28px) calc(20px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--dx-line);
+    background: #fff;
+  }
+
+  .dx-cd__line {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .dx-cd__line--total {
+    font-family: var(--dx-fh);
+    font-size: 14px;
+  }
+
+  .dx-cd__note,
+  .dx-cd__err {
+    margin: 0;
+    font-size: 12px;
+    color: var(--dx-muted);
+  }
+
+  .dx-cd__err {
+    color: #b42318;
+  }
+
+  .dx-cd__go {
+    min-height: 54px;
+  }
+
+  .dx-cd__view {
+    justify-self: center;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .dx-cd__empty {
+    flex: 1;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 22px;
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    .dx-cd__row {
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dx-cd__panel,
+    .dx-cd__ov {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DX Cart drawer",
+  "class": "dx-cart-drawer-section",
+  "settings": [
+    { "type": "checkbox", "id": "enabled", "label": "Open the cart as a side drawer", "default": true, "info": "When off, CART links open the cart page." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Cart" },
+    { "type": "text", "id": "tax_note", "label": "Note under subtotal", "default": "Taxes and shipping are calculated at checkout." },
+    { "type": "text", "id": "checkout_label", "label": "Checkout button", "default": "Check out" },
+    { "type": "text", "id": "empty_text", "label": "Empty cart text", "default": "Your cart is empty." },
+    { "type": "text", "id": "empty_cta", "label": "Empty cart button", "default": "Continue shopping" },
+    { "type": "url", "id": "empty_link", "label": "Empty cart link" }
+  ]
+}
+{% endschema %}

@@ -117,6 +117,7 @@
         addLabel.textContent = 'Added';
         setTimeout(update, 1600);
         await DX.refreshCart?.();
+        if (await DX.openCart?.()) return;
         DX.toast?.(`<span>${json.product_title || 'Item'} added to cart</span><a href="${data.cartUrl}">View cart</a>`);
       } catch (ex) {
         if (err) {

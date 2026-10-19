@@ -68,6 +68,153 @@
   document.addEventListener('cart:update', () => DX.refreshCart());
   window.addEventListener('pageshow', (e) => e.persisted && DX.refreshCart());
 
+  /* ---------- Cart drawer (sections/dx-cart-drawer.liquid) ----------
+     Content always comes from Shopify: the section is re-rendered through the Section Rendering API
+     after each /cart/change.js call, so totals, discounts and variants stay exact. */
+  const CD_ID = 'dx-cart-drawer';
+  const root = () => window.Shopify?.routes?.root || '/';
+  const drawer = () => document.querySelector('[data-dx-cart-drawer]');
+  const onCartPage = () => (document.querySelector('main')?.dataset.template || '').startsWith('cart');
+  let lastFocus = null;
+
+  const swapDrawer = (html) => {
+    const el = drawer();
+    if (!el || !html) return;
+    const fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('[data-dx-cart-drawer]');
+    if (!fresh) return;
+    el.querySelector('.dx-cd__panel').innerHTML = fresh.querySelector('.dx-cd__panel').innerHTML;
+    el.dataset.count = fresh.dataset.count;
+    DX.setCartCount(fresh.dataset.count);
+  };
+
+  DX.renderCartDrawer = async () => {
+    try {
+      const res = await fetch(`${root()}?sections=${CD_ID}`, { headers: { Accept: 'application/json' } });
+      const json = await res.json();
+      swapDrawer(json[CD_ID]);
+    } catch (e) { /* keep what is on screen */ }
+  };
+
+  const focusables = (el) =>
+    [...el.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter(
+      (n) => n.offsetParent !== null
+    );
+
+  DX.openCart = async ({ refresh = true } = {}) => {
+    const el = drawer();
+    if (!el || el.dataset.enabled === 'false' || onCartPage()) return false;
+    if (refresh) await DX.renderCartDrawer();
+    lastFocus = document.activeElement;
+    document.dispatchEvent(new CustomEvent('dx:menu-close'));
+    el.classList.add('is-open');
+    document.documentElement.classList.add('dx-lock');
+    requestAnimationFrame(() => el.querySelector('.dx-cd__panel')?.focus({ preventScroll: true }));
+    return true;
+  };
+
+  DX.closeCart = () => {
+    const el = drawer();
+    if (!el || !el.classList.contains('is-open')) return;
+    el.classList.remove('is-open');
+    document.documentElement.classList.remove('dx-lock');
+    lastFocus?.focus?.({ preventScroll: true });
+  };
+
+  const changeLine = async (key, quantity) => {
+    const el = drawer();
+    const row = el?.querySelector(`.dx-cd__row[data-key="${CSS.escape(key)}"]`);
+    el?.classList.add('is-busy');
+    row?.classList.add('is-busy');
+    try {
+      const res = await fetch(`${root()}cart/change.js`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ id: key, quantity, sections: CD_ID, sections_url: location.pathname })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.description || json.message || 'Could not update the cart');
+      swapDrawer(json.sections?.[CD_ID]);
+      document.dispatchEvent(new CustomEvent('dx:cart', { detail: json }));
+    } catch (ex) {
+      await DX.renderCartDrawer();
+      const err = drawer()?.querySelector('[data-dx-cd-err]');
+      if (err) {
+        err.textContent = ex.message;
+        err.hidden = false;
+      }
+    } finally {
+      drawer()?.classList.remove('is-busy');
+    }
+  };
+
+  let qtyTimer;
+  document.addEventListener('click', (e) => {
+    const opener = e.target.closest('[data-dx-cart-open]');
+    if (opener) {
+      const el = drawer();
+      if (!el || el.dataset.enabled === 'false' || onCartPage()) return;
+      e.preventDefault();
+      DX.openCart();
+      return;
+    }
+    if (!drawer()?.classList.contains('is-open')) return;
+    if (e.target.closest('[data-dx-cd-close]')) {
+      e.preventDefault();
+      DX.closeCart();
+      return;
+    }
+    const step = e.target.closest('[data-dx-cd-step]');
+    if (step) {
+      const input = step.parentElement.querySelector('[data-dx-cd-qty]');
+      const inc = Number(input.step) || 1;
+      input.value = Math.max(0, Number(input.value) + Number(step.dataset.dxCdStep) * inc);
+      const key = step.closest('.dx-cd__row').dataset.key;
+      clearTimeout(qtyTimer);
+      qtyTimer = setTimeout(() => changeLine(key, Number(input.value)), 350);
+      return;
+    }
+    const rm = e.target.closest('[data-dx-cd-remove]');
+    if (rm) {
+      e.preventDefault();
+      changeLine(rm.closest('.dx-cd__row').dataset.key, 0);
+    }
+  });
+
+  document.addEventListener('change', (e) => {
+    if (!e.target.matches('[data-dx-cd-qty]')) return;
+    clearTimeout(qtyTimer);
+    changeLine(e.target.closest('.dx-cd__row').dataset.key, Math.max(0, Number(e.target.value) || 0));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const el = drawer();
+    if (!el?.classList.contains('is-open')) return;
+    if (e.key === 'Escape') {
+      DX.closeCart();
+      return;
+    }
+    if (e.key === 'Enter' && e.target.matches('[data-dx-cd-qty]')) {
+      e.preventDefault();
+      e.target.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const list = focusables(el.querySelector('.dx-cd__panel'));
+    if (!list.length) return;
+    const first = list[0];
+    const last = list[list.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !el.contains(document.activeElement))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  // Other parts of the theme (or apps) that change the cart keep the drawer in sync.
+  document.addEventListener('cart:update', () => drawer() && DX.renderCartDrawer());
+
   /* ---------- Announcement bar ---------- */
   const initAnnouncement = (root) => {
     if (!once(root, 'dxAnn')) return;
@@ -168,6 +315,7 @@
         if (open) panel.querySelector('a')?.focus();
       });
       document.addEventListener('keydown', (e) => e.key === 'Escape' && root.classList.contains('is-menu') && (close(), toggle.focus()));
+      document.addEventListener('dx:menu-close', () => root.classList.contains('is-menu') && close());
       window.matchMedia('(min-width: 900px)').addEventListener('change', (e) => e.matches && close());
     }
   };

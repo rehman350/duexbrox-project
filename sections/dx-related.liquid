@@ -93,9 +93,26 @@
     gap: clamp(12px, 1.4vw, 24px);
   }
 
+  /* Phones: a swipeable row (two cards and a peek of the next) instead of a grid with an orphan card. */
   @media (max-width: 699px) {
     .dx-rel__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 44%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin-inline: calc(var(--dx-gutter) * -1);
+      padding-inline: var(--dx-gutter);
+      scroll-padding-inline: var(--dx-gutter);
+    }
+
+    .dx-rel__grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .dx-rel__grid > li {
+      scroll-snap-align: start;
     }
   }
 {% endstylesheet %}
