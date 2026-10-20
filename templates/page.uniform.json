@@ -24,6 +24,17 @@
             "handles": "i-dont-say-hi-back-tee, the-cargo-short"
           }
         },
+        "uniform_37gEV3": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "page_handle": "",
+            "number": "01",
+            "preview": "",
+            "products": [],
+            "handles": ""
+          }
+        },
         "uniform_2": {
           "type": "uniform",
           "settings": {
@@ -85,6 +96,7 @@
       },
       "block_order": [
         "uniform_1",
+        "uniform_37gEV3",
         "uniform_2",
         "uniform_3",
         "uniform_4",
