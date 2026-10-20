@@ -1,7 +1,8 @@
 {%- comment -%}
-  DUEXBROX individual Uniform page. Supports dx_uniform metaobject entries
-  and Uniform blocks assigned to individual Shopify pages.
-  The hero uses one real Shopify image, with no blurred duplicate.
+  DUEXBROX individual Uniform page.
+  - On the metaobject template (templates/metaobject/dx_uniform.json) it reads the current dx_uniform entry.
+  - On a page (templates/page.uniform.json) it shows the Uniform block whose "Page" matches the
+    current page, so one template serves all six uniforms.
 {%- endcomment -%}
 {%- liquid
   assign s = section.settings
@@ -50,10 +51,19 @@
     endif
   endif
 -%}
+{%- liquid
+  # A portrait photo (like the 4:5 uniform shots) is shown whole on a soft blurred copy of itself
+  # instead of being cropped to a thin wide strip. Wide photos fill the banner as before.
+  assign portrait = false
+  if hero != blank and hero.aspect_ratio < 1.2
+    assign portrait = true
+  endif
+-%}
 <div class="dx dx-uf" {% if current_block %}{{ current_block.shopify_attributes }}{% endif %}>
-  <div class="dx-media dx-uf__hero">
-    {%- if hero != blank -%}
-      {{ hero | image_url: width: 3200 | image_tag: widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high', class: 'dx-uf__hero-image' }}
+  <div class="dx-media dx-uf__hero{% if portrait %} is-portrait{% endif %}">
+    {%- if portrait -%}
+      {{ hero | image_url: width: 400 | image_tag: loading: 'eager', alt: '', class: 'dx-uf__blur', aria-hidden: 'true' }}
+      {{ hero | image_url: width: 1600 | image_tag: widths: '600,900,1200,1600', sizes: '(min-width: 700px) 40vw, 100vw', loading: 'eager', fetchpriority: 'high', class: 'dx-uf__fit' }}
     {%- else -%}
       {%- render 'dx-img', image: hero, preview: hero_preview, ph: 'lifestyle-1', width: 3200, widths: '750,1100,1500,1920,2400,3200', sizes: '100vw', loading: 'eager', fetchpriority: 'high' -%}
     {%- endif -%}
@@ -62,6 +72,7 @@
   <div class="dx-wrap">
     <h1 class="dx-h dx-uf__h">{{ s.prefix | escape }} {{ number | escape }}</h1>
     <p class="dx-uf__sub">{{ s.subtitle | escape }}</p>
+
     <ul class="dx-uf__grid" role="list">
       {%- liquid
         assign items = products
@@ -112,48 +123,124 @@
 </div>
 
 {% stylesheet %}
-  .dx-uf { padding-bottom: clamp(56px, 6vw, 110px); }
+  .dx-uf {
+    padding-bottom: clamp(56px, 6vw, 110px);
+  }
+
   .dx-uf__hero {
-    position: relative;
-    display: block;
-    width: 100%;
     aspect-ratio: 2.74 / 1;
     max-height: 82svh;
-    overflow: hidden;
-    isolation: isolate;
-  }
-  /* Scoped to the Uniform hero only. Overrides general dx-media image positioning. */
-  .dx-uf .dx-uf__hero > img,
-  .dx-uf .dx-uf__hero > picture,
-  .dx-uf .dx-uf__hero > picture > img {
-    display: block;
     width: 100%;
-    height: 100%;
-    max-width: none;
   }
-  .dx-uf .dx-uf__hero > img,
-  .dx-uf .dx-uf__hero > picture > img {
-    position: absolute;
-    inset: 0;
-    object-fit: cover;
-    object-position: center center;
-    filter: none;
-    transform: none;
+
+  .dx-uf__hero.is-portrait > .dx-uf__blur {
+    filter: blur(32px) saturate(0.9);
+    transform: scale(1.2);
   }
-  .dx-uf__h { padding-top: clamp(40px, 5vw, 80px); font-size: clamp(22px, 2vw, 36px); letter-spacing: 0.04em; }
-  .dx-uf__sub { margin-top: 14px; font-size: clamp(13px, 1vw, 18px); text-transform: uppercase; color: #4a4a4a; }
-  .dx-uf__grid { list-style: none; margin: clamp(32px, 4vw, 64px) auto 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(12px, 1vw, 16px); }
-  .dx-uf__item { flex: 0 1 min(370px, calc(50% - 8px)); min-width: 0; }
-  .dx-uf__media { display: block; aspect-ratio: 370 / 470; }
-  .dx-uf__row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 18px; }
-  .dx-uf__t { font-family: var(--dx-fb); font-weight: 700; font-size: clamp(13px, 0.95vw, 17px); letter-spacing: 0.04em; text-transform: uppercase; }
-  .dx-uf__shop { flex: none; font-family: var(--dx-fb); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
-  .dx-uf__p { margin-top: 10px; font-size: 15px; color: #444; }
-  .dx-uf__back { margin-top: clamp(40px, 5vw, 72px); text-align: center; }
+
+  .dx-uf__hero.is-portrait > .dx-uf__fit {
+    object-fit: contain;
+  }
+
+  @media (min-width: 700px) and (max-width: 1099px) {
+    .dx-uf__hero.is-portrait {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (max-width: 699px) {
+    .dx-uf__hero.is-portrait {
+      aspect-ratio: 4 / 5;
+      max-height: none;
+    }
+
+    .dx-uf__hero.is-portrait > .dx-uf__fit {
+      object-fit: cover;
+    }
+  }
+
+  .dx-uf__h {
+    padding-top: clamp(40px, 5vw, 80px);
+    font-size: clamp(22px, 2vw, 36px);
+    letter-spacing: 0.04em;
+  }
+
+  .dx-uf__sub {
+    margin-top: 14px;
+    font-size: clamp(13px, 1vw, 18px);
+    text-transform: uppercase;
+    color: #4a4a4a;
+  }
+
+  .dx-uf__grid {
+    list-style: none;
+    margin: clamp(32px, 4vw, 64px) auto 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(12px, 1vw, 16px);
+  }
+
+  .dx-uf__item {
+    flex: 0 1 min(370px, calc(50% - 8px));
+    min-width: 0;
+  }
+
+  .dx-uf__media {
+    display: block;
+    aspect-ratio: 370 / 470;
+  }
+
+  .dx-uf__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .dx-uf__t {
+    font-family: var(--dx-fb);
+    font-weight: 700;
+    font-size: clamp(13px, 0.95vw, 17px);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .dx-uf__shop {
+    flex: none;
+    font-family: var(--dx-fb);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .dx-uf__p {
+    margin-top: 10px;
+    font-size: 15px;
+    color: #444;
+  }
+
+  .dx-uf__back {
+    margin-top: clamp(40px, 5vw, 72px);
+    text-align: center;
+  }
+
   @media (max-width: 599px) {
-    .dx-uf__hero { aspect-ratio: 4 / 5; max-height: none; }
-    .dx-uf__item { flex-basis: calc(50% - 6px); }
-    .dx-uf__row { flex-direction: column; gap: 8px; }
+    .dx-uf__hero {
+      aspect-ratio: 4 / 5;
+    }
+
+    .dx-uf__item {
+      flex-basis: calc(50% - 6px);
+    }
+
+    .dx-uf__row {
+      flex-direction: column;
+      gap: 8px;
+    }
   }
 {% endstylesheet %}
 
@@ -178,7 +265,7 @@
         { "type": "page", "id": "page", "label": "Page", "info": "The Shopify page this uniform appears on (e.g. Uniform 01)." },
         { "type": "text", "id": "page_handle", "label": "Page handle (fallback)", "info": "Used while Page is empty, e.g. uniform-01. A page ending in the same number also matches." },
         { "type": "text", "id": "number", "label": "Number", "default": "01" },
-        { "type": "image_picker", "id": "image", "label": "Hero image", "info": "Choose an original landscape image for a full-width banner. Portrait images fill the banner but are cropped; no blurred backdrop is added." },
+        { "type": "image_picker", "id": "image", "label": "Hero image", "info": "Wide photo (2400 x 900 px or larger) fills the banner. A portrait photo is shown whole on a blurred backdrop, and as a 4:5 crop on mobile." },
         { "type": "text", "id": "preview", "label": "Temporary preview image", "info": "Bundled preview photo shown only while the image is empty. Clear it, or pick a real image, to remove it." },
         { "type": "product_list", "id": "products", "label": "Products", "limit": 4 },
         { "type": "text", "id": "handles", "label": "Product handles (fallback)", "info": "Comma-separated product handles, used only while Products is empty, e.g. digital-tee, the-wide-cargo." }
