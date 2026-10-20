@@ -69,6 +69,17 @@
             "handles": "the-sherpa-zip, the-wide-cargo"
           }
         },
+        "uniform_YjAVig": {
+          "type": "uniform",
+          "settings": {
+            "page": "",
+            "page_handle": "",
+            "number": "01",
+            "preview": "",
+            "products": [],
+            "handles": ""
+          }
+        },
         "uniform_5": {
           "type": "uniform",
           "settings": {
@@ -100,6 +111,7 @@
         "uniform_2",
         "uniform_3",
         "uniform_4",
+        "uniform_YjAVig",
         "uniform_5",
         "uniform_6"
       ],

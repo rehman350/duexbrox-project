@@ -44,10 +44,20 @@
           "settings": {
             "number": "01",
             "image": "shopify://shop_images/dx-uniform-01.jpg",
-            "preview": "dx-pv-uf-01.jpg",
+            "preview": "dx-pv-uf-01.webPw",
             "products": [],
             "handles": "i-dont-say-hi-back-tee, the-cargo-short",
             "link": "/pages/uniform-01"
+          }
+        },
+        "uniform_L76exV": {
+          "type": "uniform",
+          "settings": {
+            "number": "01",
+            "preview": "",
+            "products": [],
+            "handles": "",
+            "link": ""
           }
         },
         "uniform_2": {
@@ -116,6 +126,7 @@
       },
       "block_order": [
         "uniform_1",
+        "uniform_L76exV",
         "uniform_2",
         "uniform_3",
         "uniform_4",
